@@ -162,24 +162,24 @@ const FONT = '"Huninn","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-se
 
 /* ---------- 角色設定 ---------- */
 const CHARS = {
-  mare: { id:'mare', name:'小馬蕾', line:'#2E1C1C', hair:'#2A1E1E', hairHi:'#6D5864', hairSh:'#150E0F',
+  mare: { id:'mare', name:'小馬蕾', line:'#2A1816', hair:'#2E1D1B', hairHi:'#6E4E4A', hairSh:'#170D0C', hairW:64,
     eyeTop:'#5A1812', eyeBot:'#C65A42', skin:'#FFE9DF', h:1.0, hairLen:-30, plush:'cat', mouthK:.88 },
-  freya:{ id:'freya', name:'芙蕾雅', line:'#6E4224', hair:'#F2C46B', hairHi:'#FFE8B2', hairSh:'#D39A45', white:'#FFF9F0',
+  freya:{ id:'freya', name:'芙蕾雅', line:'#7A4A26', hair:'#F3C873', hairHi:'#FFEAB8', hairSh:'#D9A04E', white:'#FFFAF2', hairW:70,
     eyeTop:'#B4301A', eyeBot:'#F6953F', skin:'#FFEDE3', h:1.07, hairLen:-22, plush:'chick', mouthK:1.12 }
 };
-const OUTFIT_KEYS = ['daily','pajama','travel','sport','special'];
-const OUTFIT_LABEL = { daily:'日常服', pajama:'睡衣', travel:'旅行服', sport:'運動服', special:'特殊服' };
-const OUTFIT_ICON = { daily:'👗', pajama:'🌙', travel:'🧳', sport:'👟', special:'🎀' };
+const OUTFIT_KEYS = ['daily','home','pajama','travel','sport','formal','special'];
+const OUTFIT_LABEL = { daily:'日常服', home:'居家服', pajama:'睡衣', travel:'旅行服', sport:'運動服', formal:'正式服', special:'特殊服' };
+const OUTFIT_ICON = { daily:'👗', home:'🧶', pajama:'🌙', travel:'🧳', sport:'👟', formal:'🖤', special:'🎀' };
 const OUTFITS = {
   mare: {
-    daily:  { top:'#FBF4EA', skirt:'#E6D2B5', legs:'#2B2326', shoes:'#5A3A2E', kind:'dress', bow:'#E7849A', puff:true },
+    daily:  { top:'#FFF8F2', skirt:'#EEDFC6', legs:'#2B2326', boots:'#2B2326', shoes:'#3A2A26', kind:'dress', bow:'#E7849A', puff:true, lace:true, pleats:true, belt:'#D9C3A3' },
     pajama: { top:'#FFFFFF', skirt:'#FFFFFF', legs:'#FFFFFF', shoes:'#F4BFCB', kind:'onesie', hood:{ color:'#FFFFFF', ears:'bear' }, dots:'#F7C6D0' },
     travel: { top:'#2F2A2E', skirt:'#E6D2B5', legs:'#2B2326', shoes:'#5A3A2E', kind:'dress', cape:'#FBF4EA', capeTrim:'#E7849A', hat:'straw', bag:'cat' },
     sport:  { top:'#9CCBEA', skirt:'#FFFFFF', legs:'#2B2326', shoes:'#FFFFFF', laces:'#E7849A', kind:'shorts', zip:'#FFFFFF', towel:'#F4A7B6', scrunchie:'#F4A7B6' },
     special:{ top:'#2B2326', skirt:'#B3263A', frill:'#2B2326', legs:'#2B2326', shoes:'#2B2326', kind:'dress', bow:'#B3263A', bigBow:true, puff:true }
   },
   freya: {
-    daily:  { top:'#FFFBF5', skirt:'#C9362E', legs:'skin', boots:'#5A3A2E', shoes:'#5A3A2E', kind:'dress', vcollar:'#D9483B', dots:'#E05A4A', sash:'#E0522B', wide:true },
+    daily:  { top:'#FFFFFF', skirt:'#FFFBF6', print:'#D9483B', under:'#C9362E', legs:'skin', boots:'#4A2E22', shoes:'#4A2E22', kind:'dress', bow:'#D23B3B', wide:true, cuff:'#D23B3B' },
     pajama: { top:'#FFFFFF', skirt:'#FFFFFF', legs:'#FFFFFF', shoes:'#F7D46A', kind:'onesie', hood:{ color:'#FFFFFF', ears:'chick' }, dots:'#F7D46A' },
     travel: { top:'#FFFBF5', skirt:'#C9362E', legs:'skin', socks:'#FFFFFF', shoes:'#5A3A2E', kind:'dress', cape:'#F6E6C6', capeTrim:'#E0522B', bag:'chick', ribbon:'#F08A3C' },
     sport:  { top:'#FFFFFF', trim:'#E0522B', skirt:'#D9483B', legs:'skin', socks:'#FFFFFF', shoes:'#FFFFFF', laces:'#E0522B', kind:'shorts', zip:'#E0522B', wrist:'#D9483B' },
@@ -290,7 +290,7 @@ const EXPR = {
   ah:{eyes:'closed',mouth:'ah'}, drink:{eyes:'closed',mouth:'o'}, focus:{eyes:'open',mouth:'small',brows:'up'},
   prank:{eyes:'wink',mouth:'tongue'}, gentle:{eyes:'smile',mouth:'smile',blush:1.2}
 };
-const EAR_FOR = { happy:.7, excited:.85, bliss:.55, sad:-.35, pout:-.2, cry:-.4, sick:-.55, sleepy:-.4, sleep:-.3, surprised:1, angry:.02, shy:.12 };
+const EAR_FOR = { normal:.2, smile:.22, gentle:.22, happy:.6, excited:.85, bliss:.55, sad:-.35, pout:-.2, cry:-.4, sick:-.55, sleepy:-.4, sleep:-.3, surprised:1, angry:.02, shy:.12 };
 
 function animState(pet, p){
   const st = { pose:'down', body:'stand', bob:0, sway:0, tilt:0, headDrop:0, leg:0, walk:false, expr:null, ear:null, earRed:false,
@@ -357,28 +357,38 @@ function baseExpr(pet){
 
 /* ---- 頭髮 ---- */
 function backHair(C, O, st, sway){
-  const L = C.line, w = 57 - st.droop * 6, b = C.hairLen + st.droop * 4;
+  const L = C.line, w = C.hairW - st.droop * 7, b = C.hairLen + st.droop * 4;
   ctx.beginPath();
-  ctx.ellipse(0, HY - 4, 58, 53, 0, PI, 0);
-  ctx.bezierCurveTo(61, HY + 34, w + 5 + sway, b - 44, w + sway, b);
-  const n = 4;
+  ctx.ellipse(0, HY - 4, 60, 54, 0, PI, 0);
+  ctx.bezierCurveTo(66, HY + 28, w - 6 + sway, HY + 70, w + 6 + sway, b - 30);
+  ctx.quadraticCurveTo(w + 12 + sway, b - 12, w + sway, b);
+  const n = 5;
   for (let i = 0; i < n; i++){
     const x0 = w - i * (2 * w / n), x1 = x0 - 2 * w / n;
-    ctx.quadraticCurveTo((x0 + x1) / 2 + sway, b + 9, x1 + sway, b);
+    ctx.quadraticCurveTo((x0 + x1) / 2 + sway, b + 12 + (i % 2) * 4, x1 + sway, b + (i % 2 ? -2 : 2));
   }
-  ctx.bezierCurveTo(-w - 5 + sway, b - 44, -61, HY + 34, -58, HY - 4);
+  ctx.quadraticCurveTo(-w - 12 + sway, b - 12, -w - 6 + sway, b - 30);
+  ctx.bezierCurveTo(-w + 6 + sway, HY + 70, -66, HY + 28, -60, HY - 4);
   ctx.closePath();
   fs(C.hair, L, 2.8);
-  ctx.strokeStyle = C.hairHi; ctx.globalAlpha = .55; ctx.lineWidth = 2.2;
-  for (const s of [-1, 1]){
-    ctx.beginPath(); ctx.moveTo(s * 46, HY + 26); ctx.quadraticCurveTo(s * 52, b + 40, s * (44 - st.droop * 4) + sway, b + 6); ctx.stroke();
+  ctx.lineWidth = 2;
+  for (const s of [-1, 1]) for (const [k, col] of [[0, C.hairSh], [1, C.hairHi]]){
+    const x = s * (w - 14 - k * 12);
+    ctx.strokeStyle = col; ctx.globalAlpha = k ? .45 : .7;
+    ctx.beginPath(); ctx.moveTo(s * (48 - k * 4), HY + 24);
+    ctx.bezierCurveTo(x + 8 * s + sway, HY + 70, x - 8 * s + sway, b - 30, x + 4 * s + sway, b + 2); ctx.stroke();
   }
   ctx.globalAlpha = 1;
 }
 function buns(C){
   for (const s of [-1, 1]){
-    ell(s * 43, HY - 40, 21, 20); fs(C.hair, C.line, 2.6);
-    ctx.strokeStyle = C.hairSh; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(s * 43, HY - 40, 11, PI * .2, PI * 1.5); ctx.stroke();
+    const cx = s * 43, cy = HY - 40;
+    ell(cx, cy, 23, 22); fs(C.hair, C.line, 2.6);
+    for (let i = 0; i < 9; i++){
+      const a = i / 9 * TAU + s * .3;
+      ell(cx + cos(a) * 14, cy + sin(a) * 13, 8.5, 5.2, a + PI / 2); fs(i % 2 ? C.hairHi : C.hair, C.hairSh, 1.4);
+    }
+    ell(cx, cy, 8, 7.5); fs(C.hair, C.hairSh, 1.4);
   }
 }
 function ribbons(C, O, t){
@@ -388,15 +398,16 @@ function ribbons(C, O, t){
       const sw = sin(t * 2 + k + s) * 3;
       ctx.beginPath();
       ctx.moveTo(s * (50 + k * 4), HY - 30);
-      ctx.quadraticCurveTo(s * (58 + k * 5) + sw, HY + 6, s * (56 + k * 8) + sw * 1.6, HY + 40 - k * 8);
-      ctx.lineCap = 'round'; ctx.strokeStyle = C.line; ctx.lineWidth = 8.5; ctx.stroke();
-      ctx.strokeStyle = k ? '#FFF6EE' : col; ctx.lineWidth = 5; ctx.stroke();
+      ctx.quadraticCurveTo(s * (60 + k * 5) + sw, HY + 14, s * (58 + k * 8) + sw * 1.6, HY + 62 - k * 10);
+      ctx.lineCap = 'round'; ctx.strokeStyle = C.line; ctx.lineWidth = 9; ctx.stroke();
+      ctx.strokeStyle = k ? '#FFF6EE' : col; ctx.lineWidth = 5.6; ctx.stroke();
+      if (!k){ ctx.strokeStyle = '#FFF6EE'; ctx.lineWidth = 1.4; ctx.stroke(); }
     }
   }
 }
 function ears(C, a, red){
   for (const s of [-1, 1]){
-    const bx = s * 45, tipX = s * (46 + 38 * cos(a)), tipY = HY + 4 - 38 * sin(a);
+    const bx = s * 45, tipX = s * (46 + 46 * cos(a)), tipY = HY + 6 - 46 * sin(a);
     ctx.beginPath(); ctx.moveTo(bx, HY - 4);
     ctx.quadraticCurveTo(s * 66, HY - 6 - 14 * sin(a), tipX, tipY);
     ctx.quadraticCurveTo(s * 62, HY + 14 - 10 * sin(a), bx - s * 2, HY + 16);
@@ -415,11 +426,12 @@ function bangsPath(){
   for (const [x, y] of pts){ ctx.quadraticCurveTo((px + x) / 2, min(py, y) - 3, x, y); px = x; py = y; }
   ctx.closePath();
 }
-function bangs(C, st){
+function bangs(C, st, dir = 1){
   bangsPath(); fs(C.hair);
   if (C.white){
     ctx.save(); bangsPath(); ctx.clip();
-    ctx.beginPath(); ctx.moveTo(-5, HY - 60); ctx.lineTo(5, HY - 60); ctx.lineTo(19, HY + 4); ctx.lineTo(-19, HY + 4); ctx.closePath();
+    const o = -9 * dir;
+    ctx.beginPath(); ctx.moveTo(o - 9, HY - 60); ctx.lineTo(o + 7, HY - 60); ctx.lineTo(o + 18, HY + 4); ctx.lineTo(o - 22, HY + 4); ctx.closePath();
     ctx.fillStyle = C.white; ctx.fill(); ctx.restore();
   }
   bangsPath(); fs(null, C.line, 2.8);
@@ -452,25 +464,28 @@ function bow(x, y, s, col, L){
   ell(x, y, 3.6 * s, 3.6 * s); fs(col, L, 2);
 }
 function flower(x, y, r, L){
-  for (let i = 0; i < 5; i++){ const a = i / 5 * TAU - PI / 2; ell(x + cos(a) * r * .95, y + sin(a) * r * .95, r * .72, r * .72); fs('#FFFFFF', L, 1.8); }
-  ell(x, y, r * .5, r * .5); fs('#F8D869', L, 1.6);
+  for (let i = 0; i < 6; i++){ const a = i / 6 * TAU - PI / 2; ell(x + cos(a) * r * .72, y + sin(a) * r * .72, r * .78, r * .42, a); fs('#FFFFFF', L, 1.6); }
+  for (let i = 0; i < 6; i++){ const a = i / 6 * TAU - PI / 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + cos(a) * r * .9, y + sin(a) * r * .9); ctx.strokeStyle = 'rgba(200,190,170,.6)'; ctx.lineWidth = 1; ctx.stroke(); }
+  ell(x, y, r * .32, r * .32); fs('#F8D869', L, 1.2);
 }
 
 /* ---- 臉 ---- */
 function eye(type, ex, ey, s, C, k){
   const L = C.line; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   const lash = () => {
-    ctx.beginPath(); ctx.moveTo(ex - 11, ey - 7); ctx.quadraticCurveTo(ex, ey - 16, ex + 11, ey - 7);
-    ctx.strokeStyle = L; ctx.lineWidth = 3.6; ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(ex + s * 10, ey - 8); ctx.lineTo(ex + s * 14, ey - 11.5); ctx.lineWidth = 2.6; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex - 12.5, ey - 8); ctx.quadraticCurveTo(ex, ey - 19, ex + 12.5, ey - 8);
+    ctx.strokeStyle = L; ctx.lineWidth = 4; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex + s * 11, ey - 9.5); ctx.lineTo(ex + s * 16, ey - 13); ctx.moveTo(ex + s * 12, ey - 6); ctx.lineTo(ex + s * 16, ey - 7.5); ctx.lineWidth = 2.4; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex + s * 5, ey + 15.5); ctx.lineTo(ex + s * 9, ey + 13.5); ctx.lineWidth = 1.6; ctx.stroke();
   };
   const open = (dx, dy) => {
-    ell(ex, ey + 1, 10, 12.5); fs('#FFFFFF');
-    const g = ctx.createLinearGradient(0, ey - 11, 0, ey + 12); g.addColorStop(0, C.eyeTop); g.addColorStop(1, C.eyeBot);
-    ell(ex + dx, ey + 1 + dy, 8.8, 11.2); ctx.fillStyle = g; ctx.fill();
-    ell(ex + dx, ey + 2 + dy, 4.4, 5.6); ctx.fillStyle = 'rgba(40,10,10,.55)'; ctx.fill();
-    ell(ex + dx - 3.2, ey - 4 + dy, 3.4, 4.1); fs('#FFFFFF');
-    ell(ex + dx + 3.2, ey + 5.5 + dy, 1.8, 1.8); fs('#FFFFFF');
+    ell(ex, ey + 1, 11.5, 14.5); fs('#FFFFFF');
+    const g = ctx.createLinearGradient(0, ey - 13, 0, ey + 15); g.addColorStop(0, C.eyeTop); g.addColorStop(.55, C.eyeBot); g.addColorStop(1, '#FFC08A');
+    ell(ex + dx, ey + 1.5 + dy, 10.2, 13.2); ctx.fillStyle = g; ctx.fill();
+    ell(ex + dx, ey + 1 + dy, 5, 6.4); ctx.fillStyle = 'rgba(40,8,8,.6)'; ctx.fill();
+    ell(ex + dx - 3.6, ey - 4.5 + dy, 4.2, 5); fs('#FFFFFF');
+    ell(ex + dx + 4, ey + 6.5 + dy, 2.2, 2.2); fs('#FFFFFF');
+    ell(ex + dx - 4.5, ey + 8 + dy, 1.2, 1.2); fs('rgba(255,255,255,.85)');
     lash();
   };
   switch (type){
@@ -599,8 +614,8 @@ function headwear(C, O, pet){
     }
   } else {
     if (!O.hood){
-      const r = O.bigFlower ? 10.5 : 7.5;
-      for (const s of [-1, 1]){ flower(s * 43, HY - 46, r, L); if (O.bigFlower) flower(s * 26, HY - 56, 5.5, L); }
+      const r = O.bigFlower ? 14 : 11.5;
+      for (const s of [-1, 1]){ flower(s * 40, HY - 50, r, L); if (O.bigFlower) flower(s * 58, HY - 30, 7, L); }
     } else flower(36, HY - 40, 6.5, L);
   }
 }
@@ -662,9 +677,19 @@ function body(C, O, st, pet){
   if (O.bag === 'chick' && !st.back) plushie('chick', -30, -112, 13, L);
   // 下半身
   ctx.beginPath();
+  if (O.kind === 'dress' && O.under){
+    ctx.moveTo(-24, -70); ctx.quadraticCurveTo(-38, -52, -45, -38); ctx.quadraticCurveTo(0, -28, 45, -38); ctx.quadraticCurveTo(38, -52, 24, -70); ctx.closePath();
+    fs(O.under, L, 2.4);
+    ctx.fillStyle = '#FFFFFF'; for (const [x, y] of [[-34, -40], [-12, -35], [12, -35], [34, -40]]){ ell(x, y, 2.2, 2.2); ctx.fill(); }
+    ctx.beginPath();
+  }
   if (O.kind === 'dress'){
     ctx.moveTo(-21, -80); ctx.quadraticCurveTo(-33, -62, -41, -44); ctx.quadraticCurveTo(0, -35, 41, -44); ctx.quadraticCurveTo(33, -62, 21, -80); ctx.closePath();
     fs(O.skirt, L, 2.6);
+    if (O.print){ for (const [x, y, r] of [[-26, -52, 4.2], [-8, -60, 3.4], [10, -50, 4.4], [27, -56, 3.2], [-14, -45, 2.8], [30, -46, 2.6]]){
+      for (let i = 0; i < 5; i++){ const a = i / 5 * TAU; ell(x + cos(a) * r * .7, y + sin(a) * r * .7, r * .55, r * .55); ctx.fillStyle = O.print; ctx.fill(); }
+      ell(x, y, r * .35, r * .35); ctx.fillStyle = '#F2C46B'; ctx.fill(); } }
+    if (O.pleats){ ctx.strokeStyle = 'rgba(150,120,90,.45)'; ctx.lineWidth = 1.4; for (const x of [-22, -9, 4, 17, 30]){ ctx.beginPath(); ctx.moveTo(x * .55, -76); ctx.lineTo(x, -42); ctx.stroke(); } }
     if (O.frill){
       ctx.beginPath(); ctx.moveTo(-41, -44);
       for (let i = 0; i < 6; i++){ const x0 = -41 + i * 82 / 6, x1 = x0 + 82 / 6; ctx.quadraticCurveTo((x0 + x1) / 2, -32 + (i === 0 || i === 5 ? -2 : 1), x1, -44 + (i === 5 ? 0 : 2)); }
@@ -680,7 +705,13 @@ function body(C, O, st, pet){
   // 上衣
   ctx.beginPath(); ctx.moveTo(-14, -115); ctx.quadraticCurveTo(-26, -113, -27, -98); ctx.lineTo(-24, -74); ctx.quadraticCurveTo(0, -69, 24, -74);
   ctx.lineTo(27, -98); ctx.quadraticCurveTo(26, -113, 14, -115); ctx.closePath(); fs(O.top, L, 2.6);
+  if (O.belt){ rr(-24, -82, 48, 6, 3); fs(O.belt, L, 1.6); }
   if (st.back) return;
+  if (O.lace){
+    ctx.beginPath(); ctx.moveTo(-13, -116);
+    for (let i = 0; i < 5; i++){ const x0 = -13 + i * 5.2; ctx.arc(x0 + 2.6, -113, 2.6, PI, 0, true); }
+    ctx.lineTo(13, -118); ctx.closePath(); fs('#FFFFFF', L, 1.4);
+  }
   if (O.dots){ ctx.fillStyle = O.dots; for (const [x, y] of [[-14, -100], [10, -94], [-6, -84], [16, -82], [-18, -86], [3, -104]]){ ell(x, y, 2.4, 2.4); ctx.fill(); } }
   if (O.trim){ ctx.strokeStyle = O.trim; ctx.lineWidth = 3.2; for (const s of [-1, 1]){ ctx.beginPath(); ctx.moveTo(s * 25, -98); ctx.lineTo(s * 23, -76); ctx.stroke(); } }
   if (O.zip){ ctx.strokeStyle = O.zip; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(0, -113); ctx.lineTo(0, -73); ctx.stroke(); rr(-2.5, -110, 5, 7, 1.5); fs(O.zip, L, 1.2); }
@@ -706,7 +737,7 @@ function arm(C, O, s, hx, hy, st){
   const L = C.line, sx = s * 21, sy = -106, sleeve = O.top;
   seg(sx, sy, hx, hy, 11, sleeve, L);
   if (O.puff){ ell(sx, sy + 3, 9.5, 8.5); fs(sleeve, L, 2.2); }
-  if (O.wide){ const ux = hx + (sx - hx) * .18, uy = hy + (sy - hy) * .18; ell(ux, uy, 9.5, 8); fs(sleeve, L, 2.2); }
+  if (O.wide){ const ux = hx + (sx - hx) * .18, uy = hy + (sy - hy) * .18; ell(ux, uy, 10, 8.5); fs(sleeve, L, 2.2); if (O.cuff){ ell(ux, uy, 10, 3); fs(O.cuff); } }
   if (O.wrist){ const ux = hx + (sx - hx) * .2, uy = hy + (sy - hy) * .2; ell(ux, uy, 6.8, 6.8); fs(O.wrist, L, 2); }
   ell(hx, hy, 7.2, 7.2); fs(C.skin, L, 2.4);
 }
@@ -748,7 +779,7 @@ function drawFigure(pet, C, O, st, p, now){
     }
     ell(0, HY, 48, 43); fs(C.skin, C.line, 2.8);
     face(C, st, p, pet.blink);
-    bangs(C, st);
+    bangs(C, st, pet.dir);
     brows(C, st);
     if (O.hood) hoodFront(C, O);
     headwear(C, O, pet);
@@ -777,6 +808,64 @@ function drawSprite(pet, now){
   return true;
 }
 
+/* ---- 角色圖：從設定圖裁切的 Q 版角色（有這些圖時優先使用） ---- */
+const REF = {};
+const REF_LIST = {
+  act: ['idle', 'walk', 'eat', 'play', 'bath', 'sleep', 'happy', 'angry'],
+  face: { mare: ['normal', 'smile', 'happy', 'spoiled', 'surprised', 'angry', 'sad', 'sleepy'], freya: ['normal', 'smile', 'happy', 'spoiled', 'surprised', 'confused', 'shy', 'sleepy'] },
+  wear: ['daily', 'home', 'pajama', 'travel', 'sport', 'formal', 'special']
+};
+for (const ch of ['mare', 'freya']) for (const g of ['act', 'face', 'wear']) for (const n of (g === 'face' ? REF_LIST.face[ch] : REF_LIST[g])){
+  const img = new Image(); img.onload = () => { REF[`${ch}_${g}_${n}`] = img; };
+  img.src = `assets/characters/${ch}/${g}/${ch}_${g}_${n}.png`;
+}
+const FACE_MAP = {
+  mare: { normal:'normal', smile:'smile', gentle:'smile', happy:'happy', excited:'happy', bliss:'happy', eat:'happy', spoiled:'spoiled', shy:'spoiled',
+    surprised:'surprised', angry:'angry', sad:'sad', pout:'sad', cry:'sad', sick:'sleepy', sleepy:'sleepy', confused:'normal', prank:'happy', focus:'normal', ah:'happy', drink:'smile', sleep:'sleepy' },
+  freya: { normal:'normal', smile:'smile', gentle:'smile', happy:'happy', excited:'happy', bliss:'happy', eat:'happy', spoiled:'spoiled', shy:'shy',
+    surprised:'surprised', angry:'surprised', sad:'confused', pout:'confused', cry:'confused', sick:'sleepy', sleepy:'sleepy', confused:'confused', prank:'happy', focus:'normal', ah:'happy', drink:'smile', sleep:'sleepy' }
+};
+function refPick(pet, st){
+  const a = pet.anim, id = pet.id, o = pet.outfit;
+  const act = n => [`${id}_act_${n}`, n === 'sleep' ? 'lie' : n === 'bath' ? 'tub' : 'stand'];
+  const stand = () => o === 'daily' ? act('idle') : [`${id}_wear_${o}`, 'stand'];
+  if (a === 'sleep' || a === 'care_m') return act('sleep');
+  if (a === 'bath') return act('bath');
+  if (['eat', 'fed', 'duo_eaten', 'duo_eat'].includes(a)) return act('eat');
+  if (['play_toy', 'duo_play', 'minigame'].includes(a)) return act('play');
+  if (a === 'walk' || a === 'mg_run') return o === 'daily' ? [`${id}_act_walk`, 'walk'] : [`${id}_wear_${o}`, 'stand'];
+  if (a === 'happy' && o === 'daily') return act('happy');
+  if (a === 'angry') return act('angry');
+  if (['idle', 'tv', 'care', 'duo_feed', 'search', 'wave', 'groom', 'drink'].includes(a) && ['normal', 'smile', 'gentle', 'happy', 'drink'].includes(st.expr)) return stand();
+  return [`${id}_face_${FACE_MAP[id][st.expr] || 'normal'}`, 'sit'];
+}
+const REF_H = { stand:118, walk:118, sit:100, tub:92, lie:68 };
+function drawRef(pet, st, now){
+  let [key, kind] = refPick(pet, st), img = REF[key];
+  if (!img){ img = REF[`${pet.id}_act_idle`]; kind = 'stand'; }
+  if (!img) return false;
+  const h = REF_H[kind] * (pet.id === 'freya' ? 1.05 : 1), k = h / img.height, w = img.width * k;
+  let cx = pet.x, by = pet.y;
+  if (kind === 'lie'){ cx = pet.x - 52; by = pet.y + 16; }
+  if (kind !== 'lie'){ ell(cx, by - 1, w * .34 * (1 - st.bob / 70), 6); ctx.fillStyle = 'rgba(110,60,70,.16)'; ctx.fill(); }
+  ctx.save();
+  ctx.translate(cx, by); ctx.rotate(st.sway); ctx.translate(0, -st.bob);
+  if (st.squash) ctx.scale(1 + st.squash, 1 - st.squash);
+  if (kind === 'walk' && pet.dir === 1) ctx.scale(-1, 1);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, -w / 2, -h, w, h);
+  ctx.restore();
+  pet._top = by - h - st.bob; pet._cx = kind === 'lie' ? cx - w * .25 : cx; pet._by = by; pet._h = h; pet._w = w; pet._kind = kind;
+  const a = pet.anim;
+  if (st.ice){ rr(pet._cx - 13, pet._top + 4, 26, 9, 4); fs('#A9DDF5', '#5A8CA8', 1.6); }
+  if (a === 'drink') emoji('🥛', cx + w * .28, by - h * .42, 20);
+  if (a === 'duo_feed') emoji('🍰', cx + (pet.dir > 0 ? 1 : -1) * w * .42, by - h * .45, 20);
+  if (a === 'fed' && pet.prop) emoji(pet.prop, cx + w * .2, by - h * .62, 20);
+  if (a === 'minigame') emoji('🎮', cx, by - h * .3, 20);
+  if (a === 'mare_prank') emoji('🐛', cx + w * .4, by - h * .35, 16);
+  return true;
+}
+
 function tubBack(){ ell(0, -40, 74, 20); fs('#CDEBF7', '#5C7C8C', 2.6); }
 function tubFront(p){
   ctx.beginPath(); ctx.moveTo(-74, -40); ctx.quadraticCurveTo(-72, 4, 0, 4); ctx.quadraticCurveTo(72, 4, 74, -40); ctx.quadraticCurveTo(0, -24, -74, -40); ctx.closePath();
@@ -787,12 +876,13 @@ function tubFront(p){
 }
 
 function drawPet(pet, now){
-  const C = CHARS[pet.id], O = OUTFITS[pet.id][pet.outfit];
+  const C = CHARS[pet.id], O = OUTFITS[pet.id][pet.outfit] || OUTFITS[pet.id].daily;
   const p = (now - pet.animStart) / 1000;
   const st = animState(pet, p);
   const S = .58 * C.h;
-  pet._st = st; pet._S = S;
+  pet._st = st; pet._S = S; pet._top = null;
   if (drawSprite(pet, now)) return;
+  if (drawRef(pet, st, now)) return;
   ctx.save(); ctx.translate(pet.x, pet.y);
   if (st.body !== 'lie' && st.body !== 'tub'){
     ell(0, 0, (st.body === 'sit' ? 34 : 28) * S / .58 * (1 - st.bob / 70), 6.5); ctx.fillStyle = 'rgba(110,60,70,.16)'; ctx.fill();
@@ -821,6 +911,7 @@ function drawBlanket(pet, S){
 /* ---- 頭頂符號與對話框（螢幕座標） ---- */
 function headPt(pet){
   const st = pet._st, S = pet._S || .58;
+  if (pet._top != null) return { x: pet._cx, y: pet._top + 8 };
   if (!st) return { x: pet.x, y: pet.y - 120 };
   if (st.body === 'lie') return { x: pet.x - 156 * S, y: pet.y - 52 * S };
   const sit = st.body === 'sit' ? 24 : st.body === 'tub' ? 34 : 0;
@@ -1304,6 +1395,7 @@ cv.addEventListener('pointerdown', ev => {
   if (mg){ mg.tx = clamp(x, 26, W - 26); return; }
   const hit = [...pets].sort((a, b) => b.y - a.y).find(p => {
     const st = p._st, S = p._S || .58;
+    if (p._top != null) return abs(x - p._cx) < max(30, p._w * .42) && y > p._top - 4 && y < p._by + 6;
     if (st && st.body === 'lie') return x > p.x - 170 * S && x < p.x + 10 && abs(y - p.y) < 50 * S;
     const top = headPt(p).y;
     return abs(x - p.x) < 40 && y > top - 4 && y < p.y + 6;
@@ -1312,7 +1404,7 @@ cv.addEventListener('pointerdown', ev => {
   const wasSel = selected === hit.id;
   selected = hit.id; renderUI();
   const st = hit._st, top = headPt(hit).y;
-  const onHead = st && st.body !== 'lie' ? y < top + 62 * (hit._S || .58) / .58 * .9 : x < hit.x - 100 * (hit._S || .58);
+  const onHead = hit._top != null ? (hit._kind === 'lie' ? x < hit._cx + hit._w * .1 : y < hit._top + hit._h * .45) : st && st.body !== 'lie' ? y < top + 62 * (hit._S || .58) / .58 * .9 : x < hit.x - 100 * (hit._S || .58);
   if (onHead && (wasSel || true)) doAction('pat');
 });
 cv.addEventListener('pointermove', ev => { if (mg && (ev.buttons || ev.pointerType !== 'mouse')){ mg.tx = clamp(toLocal(ev).x, 26, W - 26); } });
