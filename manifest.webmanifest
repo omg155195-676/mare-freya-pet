@@ -1,0 +1,17 @@
+{
+  "name": "小馬蕾 × 芙蕾雅",
+  "short_name": "馬蕾芙蕾雅",
+  "description": "小馬蕾與芙蕾雅的雙角色電子雞",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F9E9EC",
+  "theme_color": "#F9E9EC",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

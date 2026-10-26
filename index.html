@@ -1,0 +1,1575 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F9E9EC">
+<meta name="description" content="小馬蕾與芙蕾雅的雙角色電子雞">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="馬蕾芙蕾雅">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>小馬蕾 × 芙蕾雅</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap">
+<style>
+/* 版面：手機直式單欄 — 狀態卡 → 房間畫面 → 動作面板。刻意採用單一暖色主題（像一台粉色電子雞機身），不跟隨深色模式。 */
+:root{
+  color-scheme: light;
+  --bg:#F9E9EC;          /* 機身底色：淡櫻花 */
+  --panel:#FFF9F8;       /* 面板 */
+  --ink:#4A2B31;         /* 文字：深可可 */
+  --muted:#8F6A71;
+  --hair:#EDD0D6;        /* 分隔線 */
+  --mare:#DE7690;        /* 小馬蕾代表色 */
+  --mare-soft:#FBE0E7;
+  --freya:#DE9A2E;       /* 芙蕾雅代表色 */
+  --freya-soft:#FCEBCB;
+  --low:#D5544E;
+  --font:"Huninn","PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+  --r:16px;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;-webkit-tap-highlight-color:transparent}
+.app{max-width:470px;margin:0 auto;padding-block:10px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand h1{margin:0;font-size:21px;font-weight:400;letter-spacing:.02em;text-wrap:balance}
+.brand h1 .m{color:var(--mare)}.brand h1 .f{color:var(--freya)}.brand h1 .x{color:var(--muted);font-size:15px;padding:0 2px}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.icon-btn{border:1px solid var(--hair);background:var(--panel);color:var(--ink);border-radius:999px;height:36px;padding:0 14px;font:inherit;font-size:13px;cursor:pointer}
+.icon-btn:focus-visible,.card:focus-visible,.act:focus-visible,.tab:focus-visible,.opt:focus-visible{outline:3px solid var(--mare);outline-offset:2px}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{min-width:0;text-align:left;font:inherit;color:inherit;background:var(--panel);border:2px solid transparent;border-radius:var(--r);padding:8px 10px 9px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .15s, transform .15s}
+.card[data-pet=mare][aria-pressed=true]{border-color:var(--mare)}
+.card[data-pet=freya][aria-pressed=true]{border-color:var(--freya)}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.card-name{font-size:15px}
+.card[data-pet=mare] .card-name{color:var(--mare)}.card[data-pet=freya] .card-name{color:var(--freya)}
+.chip{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--mare-soft);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
+.card[data-pet=freya] .chip{background:var(--freya-soft)}
+.chip.warn{background:var(--low);color:#fff}
+.bars{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+.bar{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.bar i{display:block;height:6px;border-radius:6px;background:var(--hair);overflow:hidden;position:relative}
+.bar i b{position:absolute;inset:0 auto 0 0;border-radius:6px;background:var(--mare);transition:width .4s}
+.card[data-pet=freya] .bar i b{background:var(--freya)}
+.bar.low i b{background:var(--low)!important}
+
+.stage-wrap{position:relative;border-radius:22px;overflow:hidden;background:#F7D9DF;box-shadow:0 0 0 2px var(--hair),0 8px 22px -12px rgba(120,60,75,.45)}
+#stage{display:block;width:100%;height:auto;aspect-ratio:360/400;max-width:100%;touch-action:manipulation;cursor:pointer}
+.hint{position:absolute;left:10px;bottom:8px;font-size:11px;color:var(--ink);background:rgba(255,250,249,.82);padding:3px 9px;border-radius:999px;pointer-events:none}
+
+.panel{background:var(--panel);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:9px}
+.panel-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.target{font-size:13px;color:var(--muted)}
+.target b{font-weight:400;color:var(--ink)}
+.tabs{display:flex;gap:4px;background:var(--bg);padding:3px;border-radius:999px}
+.tab{border:0;background:transparent;font:inherit;font-size:13px;color:var(--muted);padding:5px 11px;border-radius:999px;cursor:pointer}
+.tab[aria-selected=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(120,60,75,.18)}
+.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.act{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--hair);border-radius:14px;padding:9px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;min-width:0;transition:transform .08s, background .15s}
+.act:active{transform:scale(.96)}
+.act:hover{background:#FCEFF1}
+.act .ic{font-size:22px;line-height:1}
+.act .lb{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.act .sub{font-size:10.5px;color:var(--muted)}
+.act.on{border-color:var(--mare);background:var(--mare-soft)}
+.act.duo{grid-column:span 1}
+
+.sheet{position:fixed;inset:0;background:rgba(74,43,49,.35);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet-body{background:var(--panel);width:100%;max-width:470px;border-radius:22px 22px 0 0;padding-block:16px 20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px;max-height:80vh;overflow:auto}
+.sheet h2{margin:0;font-size:17px;font-weight:400}
+.sheet p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.6}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--hair);border-radius:14px;padding:10px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center;min-width:0}
+.opt .ic{font-size:26px}
+.opt .t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.opt .t small{color:var(--muted);font-size:11px}
+.opt[aria-pressed=true]{border-color:var(--mare);background:var(--mare-soft)}
+.seg{display:flex;gap:6px}
+.seg .opt{flex:1;justify-content:center;text-align:center}
+.close{align-self:stretch;font:inherit;border:0;background:var(--ink);color:var(--panel);border-radius:14px;padding:11px;cursor:pointer}
+.danger{font:inherit;border:1px solid var(--low);background:transparent;color:var(--low);border-radius:14px;padding:10px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:9px 16px;border-radius:999px;font-size:13px;z-index:30;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion: reduce){.card,.act,.bar i b{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="m">小馬蕾</span><span class="x">×</span><span class="f">芙蕾雅</span></h1>
+      <p id="clock">　</p>
+    </div>
+    <button class="icon-btn" id="btnSettings" type="button">設定</button>
+  </header>
+
+  <section class="cards" aria-label="角色狀態">
+    <button class="card" id="card-mare" data-pet="mare" type="button" aria-pressed="true"></button>
+    <button class="card" id="card-freya" data-pet="freya" type="button" aria-pressed="false"></button>
+  </section>
+
+  <div class="stage-wrap">
+    <canvas id="stage" width="360" height="400" aria-label="小馬蕾與芙蕾雅的房間。點角色可以選擇，點頭部可以摸頭。"></canvas>
+    <div class="hint" id="hint">點角色選擇 · 點頭可以摸頭</div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-top">
+      <div class="target" id="target"></div>
+      <div class="tabs" role="tablist" aria-label="動作分類">
+        <button class="tab" role="tab" id="tab-care" data-tab="care" aria-selected="true" type="button">照顧</button>
+        <button class="tab" role="tab" id="tab-play" data-tab="play" aria-selected="false" type="button">互動</button>
+        <button class="tab" role="tab" id="tab-duo" data-tab="duo" aria-selected="false" type="button">雙人</button>
+        <button class="tab" role="tab" id="tab-wear" data-tab="wear" aria-selected="false" type="button">換裝</button>
+      </div>
+    </div>
+    <div class="actions" id="actions" role="tabpanel"></div>
+  </section>
+</div>
+
+<div class="sheet" id="sheet" hidden><div class="sheet-body" id="sheetBody"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   小馬蕾 × 芙蕾雅 電子雞 — 原型 v0.1
+   角色目前是依規格書用程式即時繪製的 Q 版佔位角色（約 2.3 頭身）。
+   正式美術完成後，把 PNG Sprite Sheet 登記在 SPRITE_OVERRIDES 即可替換。
+   ===================================================================== */
+
+/* 正式素材替換表。key = `${角色}_act_${動作}_${服裝}`
+   Sprite Sheet 規格：每格 256×256、橫向排列、腳底錨點 (128,236)、透明 PNG。 */
+const SPRITE_OVERRIDES = {
+  // 'mare_act_idle_daily': { src: 'assets/characters/mare/act/mare_act_idle_daily_sheet_4f.png', frames: 4, fps: 6 },
+};
+
+const W = 360, H = 400, TAU = Math.PI * 2;
+const { sin, cos, abs, min, max, PI, floor, random, hypot } = Math;
+const clamp = (v, a = 0, b = 100) => v < a ? a : v > b ? b : v;
+const rnd = (a, b) => a + random() * (b - a);
+const pick = a => a[floor(random() * a.length)];
+const FONT = '"Huninn","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';
+
+/* ---------- 角色設定 ---------- */
+const CHARS = {
+  mare: { id:'mare', name:'小馬蕾', line:'#2E1C1C', hair:'#2A1E1E', hairHi:'#6D5864', hairSh:'#150E0F',
+    eyeTop:'#5A1812', eyeBot:'#C65A42', skin:'#FFE9DF', h:1.0, hairLen:-30, plush:'cat', mouthK:.88 },
+  freya:{ id:'freya', name:'芙蕾雅', line:'#6E4224', hair:'#F2C46B', hairHi:'#FFE8B2', hairSh:'#D39A45', white:'#FFF9F0',
+    eyeTop:'#B4301A', eyeBot:'#F6953F', skin:'#FFEDE3', h:1.07, hairLen:-22, plush:'chick', mouthK:1.12 }
+};
+const OUTFIT_KEYS = ['daily','pajama','travel','sport','special'];
+const OUTFIT_LABEL = { daily:'日常服', pajama:'睡衣', travel:'旅行服', sport:'運動服', special:'特殊服' };
+const OUTFIT_ICON = { daily:'👗', pajama:'🌙', travel:'🧳', sport:'👟', special:'🎀' };
+const OUTFITS = {
+  mare: {
+    daily:  { top:'#FBF4EA', skirt:'#E6D2B5', legs:'#2B2326', shoes:'#5A3A2E', kind:'dress', bow:'#E7849A', puff:true },
+    pajama: { top:'#FFFFFF', skirt:'#FFFFFF', legs:'#FFFFFF', shoes:'#F4BFCB', kind:'onesie', hood:{ color:'#FFFFFF', ears:'bear' }, dots:'#F7C6D0' },
+    travel: { top:'#2F2A2E', skirt:'#E6D2B5', legs:'#2B2326', shoes:'#5A3A2E', kind:'dress', cape:'#FBF4EA', capeTrim:'#E7849A', hat:'straw', bag:'cat' },
+    sport:  { top:'#9CCBEA', skirt:'#FFFFFF', legs:'#2B2326', shoes:'#FFFFFF', laces:'#E7849A', kind:'shorts', zip:'#FFFFFF', towel:'#F4A7B6', scrunchie:'#F4A7B6' },
+    special:{ top:'#2B2326', skirt:'#B3263A', frill:'#2B2326', legs:'#2B2326', shoes:'#2B2326', kind:'dress', bow:'#B3263A', bigBow:true, puff:true }
+  },
+  freya: {
+    daily:  { top:'#FFFBF5', skirt:'#C9362E', legs:'skin', boots:'#5A3A2E', shoes:'#5A3A2E', kind:'dress', vcollar:'#D9483B', dots:'#E05A4A', sash:'#E0522B', wide:true },
+    pajama: { top:'#FFFFFF', skirt:'#FFFFFF', legs:'#FFFFFF', shoes:'#F7D46A', kind:'onesie', hood:{ color:'#FFFFFF', ears:'chick' }, dots:'#F7D46A' },
+    travel: { top:'#FFFBF5', skirt:'#C9362E', legs:'skin', socks:'#FFFFFF', shoes:'#5A3A2E', kind:'dress', cape:'#F6E6C6', capeTrim:'#E0522B', bag:'chick', ribbon:'#F08A3C' },
+    sport:  { top:'#FFFFFF', trim:'#E0522B', skirt:'#D9483B', legs:'skin', socks:'#FFFFFF', shoes:'#FFFFFF', laces:'#E0522B', kind:'shorts', zip:'#E0522B', wrist:'#D9483B' },
+    special:{ top:'#FFFFFF', skirt:'#C9362E', frill:'#FFFFFF', legs:'skin', boots:'#7A2A22', shoes:'#7A2A22', kind:'dress', vcollar:'#C9362E', sash:'#F2C46B', bigFlower:true, wide:true }
+  }
+};
+
+/* ---------- 台詞 ---------- */
+const LINES = {
+  mare: {
+    greet:['嘿～今天也要一起玩嗎？','你回來了！等你好久了～'], hungry:['肚子好餓喔…','想吃甜甜的東西…'],
+    fed:['好好吃～謝謝你！','嘿嘿，甜食最棒了！'], pat:['嘿嘿…再摸一下嘛～','好舒服…'], spoiled:['陪我玩嘛～好不好？','抱抱～'],
+    prank:['嘻嘻，芙蕾雅不會發現吧～'], sleepy:['好睏喔…'], sick:['頭暈暈的…'], bath:['泡泡好多！'],
+    wait:['你在哪裡呀…？','好無聊喔…'], praise:['真的嗎？嘿嘿，好開心！'], dirty:['身上黏黏的…'],
+    wake:['呼啊…早安…'], toy:['看我的！'], drink:['咕嚕咕嚕～'], groom:['頭髮要梳整齊～'], outfit:['好看嗎？'],
+    medicine:['藥好苦…'], healthy:['我很健康喔！'], sleepTalk:['Zzz…嘿嘿…'], night:['晚安～']
+  },
+  freya: {
+    greet:['回來啦？辛苦了～今天也很努力呢♡','歡迎回來～'], hungry:['嗯…好像該吃點東西了？'],
+    fed:['好好吃！你也吃一口？','美食果然最棒了～'], pat:['欸、欸嘿嘿…','突然摸頭…會害羞的啦。'],
+    praise:['才、才沒有那麼厲害啦！','不、不要一直誇我啦…'], confused:['咦？我剛剛要做什麼來著？','嗯？東西放哪了…'],
+    care:['別怕，我在這裡。乖乖休息喔。'], bug:['呀！蟲、蟲子！？'], scold:['小馬蕾！！'],
+    sleepy:['呼啊…有點睏了…'], sick:['頭有點燙…'], bath:['水溫剛剛好～'], wait:['你去哪裡了呢…？'],
+    dirty:['該洗澡了呢…'], wake:['早安～睡得好飽！'], toy:['好～來玩吧！'], drink:['呼，好解渴。'],
+    groom:['花飾歪了嗎？'], outfit:['這樣穿…還可以嗎？'], medicine:['唔…我會乖乖吃藥的。'], healthy:['我很好喔，不用擔心～'],
+    sleepTalk:['Zzz…小黃雞…'], night:['晚安，做個好夢～']
+  }
+};
+const line = (pet, key) => pick(LINES[pet.id][key] || ['…']);
+
+const FOODS = [
+  { id:'onigiri', icon:'🍙', name:'飯糰', desc:'飽足 +35', fx:{ hunger:35 } },
+  { id:'cake', icon:'🍰', name:'草莓蛋糕', desc:'飽足 +20 · 心情 +12', fx:{ hunger:20, mood:12 }, sweet:true },
+  { id:'pudding', icon:'🍮', name:'布丁', desc:'飽足 +15 · 親密 +3', fx:{ hunger:15, mood:8, affection:3 }, sweet:true },
+  { id:'apple', icon:'🍎', name:'蘋果', desc:'飽足 +18 · 健康 +6', fx:{ hunger:18, health:6 } },
+];
+
+/* ---------- 房間位置 ---------- */
+const SPOTS = {
+  bed1:{x:140,y:214}, bed2:{x:142,y:244}, sofa1:{x:188,y:238}, sofa2:{x:236,y:238}, window:{x:210,y:262},
+  table1:{x:62,y:356}, table2:{x:158,y:356}, toys:{x:300,y:388}, center:{x:180,y:322},
+  front1:{x:148,y:384}, front2:{x:218,y:384}, tv1:{x:244,y:300}, tv2:{x:300,y:300}, careF:{x:96,y:286}
+};
+
+/* ---------- 畫布 ---------- */
+const cv = document.getElementById('stage');
+const ctx = cv.getContext('2d');
+function resize(){
+  const dpr = min(3, window.devicePixelRatio || 1);
+  cv.width = W * dpr; cv.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+resize(); window.addEventListener('resize', resize);
+
+/* ---------- 繪圖小工具 ---------- */
+function ell(x, y, rx, ry, rot = 0){ ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, 0, TAU); }
+function fs(fill, stroke, lw){ if (fill){ ctx.fillStyle = fill; ctx.fill(); } if (stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2.6; ctx.stroke(); } }
+function rr(x, y, w, h, r){ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
+function seg(x1, y1, x2, y2, w, col, L){
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  if (L){ ctx.strokeStyle = L; ctx.lineWidth = w + 4.6; ctx.stroke(); }
+  ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke();
+}
+function emoji(ch, x, y, size){
+  ctx.save(); ctx.font = `${size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ch, x, y); ctx.restore();
+}
+
+/* =====================================================================
+   Q 版角色繪製（本地座標：腳底為原點、往上為負，頭中心 y=-158）
+   ===================================================================== */
+const HY = -158;
+
+function hands(pose, p){
+  const w = sin(p * 8);
+  switch (pose){
+    case 'swing': return [[-31, -74 + w * 4], [31, -74 - w * 4]];
+    case 'up': return [[-40, -150 + w * 3], [40, -150 - w * 3]];
+    case 'surprise': return [[-45, -122], [45, -122]];
+    case 'front': return [[-12, -88], [12, -88]];
+    case 'mouth': return [[-13, -88], [9, -126 + abs(sin(p * 6)) * 4]];
+    case 'drink': return [[-11, -124], [11, -124]];
+    case 'cheeks': return [[-33, -134], [33, -134]];
+    case 'hip': return [[-36, -82], [36, -82]];
+    case 'hug': return [[-22, -90], [22, -90]];
+    case 'reach': return [[-28, -134 + w * 3], [28, -134 - w * 3]];
+    case 'comb': return [[-32, -74], [36 + sin(p * 5) * 4, -186 + sin(p * 5) * 10]];
+    case 'brow': return [[-35, -80], [14, -176]];
+    case 'game': return [[-14, -86 + abs(w) * 2], [14, -86 + abs(sin(p * 9)) * 2]];
+    case 'deny': return [[-24 + sin(p * 14) * 7, -124], [24 + sin(p * 14) * 7, -124]];
+    case 'cheek1': return [[-32, -74], [24, -130]];
+    case 'pat': return [[-32, -74], [52, -150 + sin(p * 5) * 6]];
+    case 'feed': return [[-32, -74], [52, -118]];
+    case 'splash': return [[-44, -112 + w * 8], [44, -112 - w * 8]];
+    case 'wave': return [[-32, -74], [44, -152 + sin(p * 9) * 6]];
+    default: return [[-32, -74], [32, -74]];
+  }
+}
+
+const EXPR = {
+  normal:{eyes:'open',mouth:'small'}, smile:{eyes:'smile',mouth:'smile'}, happy:{eyes:'happy',mouth:'open'},
+  excited:{eyes:'star',mouth:'big',blush:1.3}, spoiled:{eyes:'teary',mouth:'cat',blush:1.7}, shy:{eyes:'side',mouth:'wave',blush:2.4,brows:'sad'},
+  angry:{eyes:'open',mouth:'he',brows:'angry',blush:.8}, pout:{eyes:'teary',mouth:'pout',brows:'sad'}, sad:{eyes:'open',mouth:'frown',brows:'sad',look:3},
+  cry:{eyes:'xx',mouth:'cry',brows:'sad',tears:true}, surprised:{eyes:'dot',mouth:'o',brows:'up'}, confused:{eyes:'uneven',mouth:'wave2',brows:'tilt'},
+  sleepy:{eyes:'half',mouth:'yawn'}, sick:{eyes:'swirl',mouth:'wave',blush:1.8,gloom:true},
+  sleep:{eyes:'closed',mouth:'small'}, bliss:{eyes:'happy',mouth:'cat',blush:1.9}, eat:{eyes:'happy',mouth:'chew',blush:1},
+  ah:{eyes:'closed',mouth:'ah'}, drink:{eyes:'closed',mouth:'o'}, focus:{eyes:'open',mouth:'small',brows:'up'},
+  prank:{eyes:'wink',mouth:'tongue'}, gentle:{eyes:'smile',mouth:'smile',blush:1.2}
+};
+const EAR_FOR = { happy:.7, excited:.85, bliss:.55, sad:-.35, pout:-.2, cry:-.4, sick:-.55, sleepy:-.4, sleep:-.3, surprised:1, angry:.02, shy:.12 };
+
+function animState(pet, p){
+  const st = { pose:'down', body:'stand', bob:0, sway:0, tilt:0, headDrop:0, leg:0, walk:false, expr:null, ear:null, earRed:false,
+    droop:0, item:null, itemAt:'r', plush:false, plushHigh:false, fx:null, back:false, kick:false, ice:false, squash:0 };
+  switch (pet.anim){
+    case 'idle': st.bob = sin(p * 2.6) * 1.2; st.sway = sin(p * 1.3) * .035; break;
+    case 'walk': st.pose = 'swing'; st.walk = true; st.leg = p * 11; st.bob = abs(sin(p * 11)) * 4; break;
+    case 'happy': { st.pose = 'up'; const c = p % 1.4; st.bob = c < 1 ? abs(sin(c / .5 * PI)) * 14 : 0; st.expr = 'happy'; st.fx = 'note'; break; }
+    case 'excited': { st.pose = 'up'; const c = p % 1.2; st.bob = c < 1 ? abs(sin(c / .5 * PI)) * 16 : 0; st.expr = 'excited'; st.fx = 'sparkle'; break; }
+    case 'sad': st.headDrop = 4; st.bob = -2; st.expr = 'sad'; st.droop = 1; st.fx = 'gloom'; break;
+    case 'pout': st.headDrop = 2; st.expr = 'pout'; st.sway = sin(p * 2) * .04; st.fx = 'sweat'; break;
+    case 'angry': st.pose = 'hip'; st.bob = (floor(p * 5) % 2) * 2.5; st.expr = 'angry'; st.fx = 'anger'; break;
+    case 'shy': st.pose = 'cheeks'; st.sway = sin(p * 3.2) * .07; st.expr = 'shy'; st.earRed = true; st.fx = 'heart'; break;
+    case 'surprised': st.pose = 'surprise'; st.bob = p < .35 ? sin(p / .35 * PI) * 16 : 0; st.expr = 'surprised'; st.fx = 'bang'; break;
+    case 'tired': st.bob = -3 + sin(p * 1.2); st.sway = sin(p * .9) * .05; st.expr = 'sleepy'; st.droop = .6; st.fx = 'zz'; break;
+    case 'sleep': st.body = 'lie'; st.bob = sin(p * 1.6) * .8; st.expr = pet.sick ? 'sick' : 'sleep'; st.fx = 'zzz'; st.ice = pet.sick; break;
+    case 'eat': st.pose = 'mouth'; st.item = pet.prop || '🍙'; st.expr = 'eat'; st.bob = sin(p * 6) * .8; st.fx = p % 2 < 1 ? 'heart' : null; st.ear = .6; break;
+    case 'fed': st.pose = 'front'; st.expr = 'ah'; st.item = pet.prop || '🍙'; st.itemAt = 'mouthfeed'; st.tilt = -.06; break;
+    case 'drink': st.pose = 'drink'; st.item = '🥛'; st.itemAt = 'chigh'; st.expr = 'drink'; st.tilt = -.08; break;
+    case 'play_toy': st.body = 'sit'; st.pose = 'up'; st.item = '🧸'; st.itemAt = 'cup'; st.bob = abs(sin(p * 4)) * 3; st.expr = 'happy'; st.fx = 'note'; st.kick = true; break;
+    case 'bath': st.body = 'tub'; st.pose = 'splash'; st.expr = p % 3 < 2 ? 'happy' : 'bliss'; st.fx = 'bubbles'; st.bob = sin(p * 3); break;
+    case 'groom': st.pose = 'comb'; st.expr = 'smile'; st.fx = 'sparkle'; st.tilt = sin(p * 2.5) * .05; break;
+    case 'search': st.pose = 'brow'; st.expr = 'normal'; st.fx = 'question'; st.sway = sin(p * 2) * .06; break;
+    case 'wait': st.body = 'sit'; st.kick = true; st.expr = 'pout'; st.sway = sin(p * 1.5) * .04; break;
+    case 'headpat': st.squash = .04 + sin(p * 7) * .02; st.expr = 'bliss'; st.fx = 'heart'; st.ear = .55 + sin(p * 12) * .1; st.earRed = pet.id === 'freya'; break;
+    case 'minigame': st.body = 'sit'; st.pose = 'game'; st.item = '🎮'; st.itemAt = 'c'; st.expr = 'focus'; st.bob = sin(p * 8) * .6; break;
+    case 'sick': st.body = 'sit'; st.expr = 'sick'; st.ice = true; st.droop = 1; st.sway = sin(p) * .04; st.fx = 'sweat'; break;
+    case 'mare_spoiled':
+      if (p < 1.8){ st.pose = 'hug'; st.plush = true; st.sway = sin(p * 4) * .1; } else { st.pose = 'reach'; st.bob = abs(sin(p * 5)) * 3; }
+      st.expr = 'spoiled'; st.fx = 'heart'; break;
+    case 'freya_flustered':
+      if (p < 1.6){ st.pose = 'deny'; st.bob = abs(sin(p * 9)) * 2; } else { st.pose = 'hug'; st.plush = true; st.plushHigh = true; }
+      st.expr = 'shy'; st.earRed = true; st.ear = .1 + sin(p * 14) * .07; st.fx = 'heart'; break;
+    case 'mare_prank': st.pose = 'mouth'; st.expr = 'prank'; st.fx = 'sparkle'; st.bob = abs(sin(p * 7)) * 2; break;
+    case 'cry': st.expr = 'cry'; st.bob = abs(sin(p * 8)) * 1.5; st.droop = 1; break;
+    case 'confused': st.pose = 'cheek1'; st.tilt = .14; st.expr = 'confused'; st.fx = 'question'; break;
+    case 'wave': st.pose = 'wave'; st.expr = 'happy'; st.bob = abs(sin(p * 5)) * 3; st.fx = 'heart'; break;
+    case 'care': st.pose = 'pat'; st.expr = 'gentle'; st.fx = 'heart'; st.ear = .35; break;
+    case 'care_m': st.body = 'lie'; st.expr = p < 3 ? 'sick' : 'gentle'; st.ice = true; break;
+    case 'tv': st.body = 'sit'; st.back = true; st.bob = (p % 4 > 3) ? abs(sin(p * 10)) * 2 : 0; st.sway = sin(p * .8) * .02; break;
+    case 'duo_play': st.pose = floor(p / .8) % 2 ? 'up' : 'front'; st.expr = 'happy'; st.bob = abs(sin(p * 4)) * 3; break;
+    case 'duo_feed': st.body = 'sit'; st.pose = 'feed'; st.item = '🍰'; st.expr = 'gentle'; break;
+    case 'duo_eaten': st.body = 'sit'; if (p % 3 < 1.2){ st.pose = 'front'; st.expr = 'ah'; } else { st.pose = 'mouth'; st.expr = 'eat'; st.fx = 'heart'; } break;
+    case 'duo_eat': st.body = 'sit'; st.pose = 'mouth'; st.item = '🍙'; st.expr = 'eat'; break;
+    case 'mg_run': st.pose = 'up'; st.walk = true; st.leg = p * 12; st.bob = abs(sin(p * 12)) * 3; st.expr = 'excited'; break;
+  }
+  if (!st.expr) st.expr = baseExpr(pet);
+  if (st.ear == null) st.ear = EAR_FOR[st.expr] ?? .35;
+  if (!st.droop && (st.expr === 'sad' || st.expr === 'pout' || st.expr === 'sick')) st.droop = .7;
+  if (st.expr === 'shy') st.earRed = true;
+  return st;
+}
+
+function baseExpr(pet){
+  const s = pet.stats;
+  if (pet.sick) return 'sick';
+  if (pet.sleeping) return 'sleep';
+  if (s.energy < 20) return 'sleepy';
+  if (s.hunger < 20 || s.clean < 20) return 'pout';
+  if (s.mood < 25) return 'sad';
+  if (s.mood > 60) return 'smile';
+  return 'normal';
+}
+
+/* ---- 頭髮 ---- */
+function backHair(C, O, st, sway){
+  const L = C.line, w = 57 - st.droop * 6, b = C.hairLen + st.droop * 4;
+  ctx.beginPath();
+  ctx.ellipse(0, HY - 4, 58, 53, 0, PI, 0);
+  ctx.bezierCurveTo(61, HY + 34, w + 5 + sway, b - 44, w + sway, b);
+  const n = 4;
+  for (let i = 0; i < n; i++){
+    const x0 = w - i * (2 * w / n), x1 = x0 - 2 * w / n;
+    ctx.quadraticCurveTo((x0 + x1) / 2 + sway, b + 9, x1 + sway, b);
+  }
+  ctx.bezierCurveTo(-w - 5 + sway, b - 44, -61, HY + 34, -58, HY - 4);
+  ctx.closePath();
+  fs(C.hair, L, 2.8);
+  ctx.strokeStyle = C.hairHi; ctx.globalAlpha = .55; ctx.lineWidth = 2.2;
+  for (const s of [-1, 1]){
+    ctx.beginPath(); ctx.moveTo(s * 46, HY + 26); ctx.quadraticCurveTo(s * 52, b + 40, s * (44 - st.droop * 4) + sway, b + 6); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+function buns(C){
+  for (const s of [-1, 1]){
+    ell(s * 43, HY - 40, 21, 20); fs(C.hair, C.line, 2.6);
+    ctx.strokeStyle = C.hairSh; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(s * 43, HY - 40, 11, PI * .2, PI * 1.5); ctx.stroke();
+  }
+}
+function ribbons(C, O, t){
+  const col = O.ribbon || '#D23B3B';
+  for (const s of [-1, 1]){
+    for (const k of [0, 1]){
+      const sw = sin(t * 2 + k + s) * 3;
+      ctx.beginPath();
+      ctx.moveTo(s * (50 + k * 4), HY - 30);
+      ctx.quadraticCurveTo(s * (58 + k * 5) + sw, HY + 6, s * (56 + k * 8) + sw * 1.6, HY + 40 - k * 8);
+      ctx.lineCap = 'round'; ctx.strokeStyle = C.line; ctx.lineWidth = 8.5; ctx.stroke();
+      ctx.strokeStyle = k ? '#FFF6EE' : col; ctx.lineWidth = 5; ctx.stroke();
+    }
+  }
+}
+function ears(C, a, red){
+  for (const s of [-1, 1]){
+    const bx = s * 45, tipX = s * (46 + 38 * cos(a)), tipY = HY + 4 - 38 * sin(a);
+    ctx.beginPath(); ctx.moveTo(bx, HY - 4);
+    ctx.quadraticCurveTo(s * 66, HY - 6 - 14 * sin(a), tipX, tipY);
+    ctx.quadraticCurveTo(s * 62, HY + 14 - 10 * sin(a), bx - s * 2, HY + 16);
+    ctx.closePath(); fs(red ? '#FFC2BE' : C.skin, C.line, 2.6);
+    ctx.beginPath(); ctx.moveTo(s * 50, HY + 2); ctx.quadraticCurveTo(s * 60, HY + 2 - 8 * sin(a), tipX - s * 12 * cos(a), tipY + 8);
+    ctx.strokeStyle = red ? '#F07A82' : '#F3B2B0'; ctx.lineWidth = 2.4; ctx.stroke();
+  }
+}
+function bangsPath(){
+  ctx.beginPath();
+  ctx.moveTo(-51, HY + 8);
+  ctx.bezierCurveTo(-58, HY - 40, -32, HY - 57, 0, HY - 56);
+  ctx.bezierCurveTo(32, HY - 57, 58, HY - 40, 51, HY + 8);
+  const pts = [[44, HY - 12], [37, HY - 2], [29, HY - 17], [20, HY - 5], [11, HY - 19], [5, HY - 9], [0, HY - 30], [-5, HY - 9], [-11, HY - 19], [-20, HY - 5], [-29, HY - 17], [-37, HY - 2], [-44, HY - 12], [-51, HY + 8]];
+  let px = 51, py = HY + 8;
+  for (const [x, y] of pts){ ctx.quadraticCurveTo((px + x) / 2, min(py, y) - 3, x, y); px = x; py = y; }
+  ctx.closePath();
+}
+function bangs(C, st){
+  bangsPath(); fs(C.hair);
+  if (C.white){
+    ctx.save(); bangsPath(); ctx.clip();
+    ctx.beginPath(); ctx.moveTo(-5, HY - 60); ctx.lineTo(5, HY - 60); ctx.lineTo(19, HY + 4); ctx.lineTo(-19, HY + 4); ctx.closePath();
+    ctx.fillStyle = C.white; ctx.fill(); ctx.restore();
+  }
+  bangsPath(); fs(null, C.line, 2.8);
+  ctx.strokeStyle = C.white ? C.hairSh : C.hairHi; ctx.lineWidth = 1.8; ctx.globalAlpha = .8;
+  for (const s of [-1, 1]){
+    ctx.beginPath(); ctx.moveTo(s * 2, HY - 52); ctx.quadraticCurveTo(s * 14, HY - 34, s * 20, HY - 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s * 18, HY - 48); ctx.quadraticCurveTo(s * 34, HY - 34, s * 38, HY - 6); ctx.stroke();
+  }
+  ctx.globalAlpha = .5; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 3;
+  for (const s of [-1, 1]){ ctx.beginPath(); ctx.arc(0, HY - 6, 44, PI * 1.5 + s * .45, PI * 1.5 + s * .2, s < 0 ? false : true); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  // 側邊髮束
+  for (const s of [-1, 1]){
+    const d = st.droop * 3;
+    ctx.beginPath(); ctx.moveTo(s * 51, HY - 14);
+    ctx.quadraticCurveTo(s * 57, HY + 22, s * (47 - d), HY + 52 + d);
+    ctx.quadraticCurveTo(s * 41, HY + 22, s * 38, HY - 8);
+    ctx.closePath(); fs(C.hair, C.line, 2.4);
+  }
+  // 呆毛
+  const a = st.droop ? .9 : (st.expr === 'happy' || st.expr === 'excited') ? -.25 : st.expr === 'angry' ? -.5 : 0;
+  ctx.beginPath(); ctx.moveTo(-2, HY - 54);
+  ctx.quadraticCurveTo(6 + a * 6, HY - 76 + a * 14, 16 + a * 4, HY - 70 + a * 22);
+  ctx.lineCap = 'round'; ctx.strokeStyle = C.line; ctx.lineWidth = 6.5; ctx.stroke();
+  ctx.strokeStyle = C.white || C.hair; ctx.lineWidth = 3.3; ctx.stroke();
+}
+function bow(x, y, s, col, L){
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 11 * s, y - 8 * s); ctx.lineTo(x - 11 * s, y + 8 * s); ctx.closePath(); fs(col, L, 2.2);
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 11 * s, y - 8 * s); ctx.lineTo(x + 11 * s, y + 8 * s); ctx.closePath(); fs(col, L, 2.2);
+  ell(x, y, 3.6 * s, 3.6 * s); fs(col, L, 2);
+}
+function flower(x, y, r, L){
+  for (let i = 0; i < 5; i++){ const a = i / 5 * TAU - PI / 2; ell(x + cos(a) * r * .95, y + sin(a) * r * .95, r * .72, r * .72); fs('#FFFFFF', L, 1.8); }
+  ell(x, y, r * .5, r * .5); fs('#F8D869', L, 1.6);
+}
+
+/* ---- 臉 ---- */
+function eye(type, ex, ey, s, C, k){
+  const L = C.line; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const lash = () => {
+    ctx.beginPath(); ctx.moveTo(ex - 11, ey - 7); ctx.quadraticCurveTo(ex, ey - 16, ex + 11, ey - 7);
+    ctx.strokeStyle = L; ctx.lineWidth = 3.6; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex + s * 10, ey - 8); ctx.lineTo(ex + s * 14, ey - 11.5); ctx.lineWidth = 2.6; ctx.stroke();
+  };
+  const open = (dx, dy) => {
+    ell(ex, ey + 1, 10, 12.5); fs('#FFFFFF');
+    const g = ctx.createLinearGradient(0, ey - 11, 0, ey + 12); g.addColorStop(0, C.eyeTop); g.addColorStop(1, C.eyeBot);
+    ell(ex + dx, ey + 1 + dy, 8.8, 11.2); ctx.fillStyle = g; ctx.fill();
+    ell(ex + dx, ey + 2 + dy, 4.4, 5.6); ctx.fillStyle = 'rgba(40,10,10,.55)'; ctx.fill();
+    ell(ex + dx - 3.2, ey - 4 + dy, 3.4, 4.1); fs('#FFFFFF');
+    ell(ex + dx + 3.2, ey + 5.5 + dy, 1.8, 1.8); fs('#FFFFFF');
+    lash();
+  };
+  switch (type){
+    case 'open': open(0, k.look || 0); break;
+    case 'side': open(s < 0 ? 3.5 : 3.5, 1); break;
+    case 'teary':
+      open(0, 0);
+      ell(ex + 3, ey - 6, 2, 2); fs('#FFFFFF');
+      ctx.beginPath(); ctx.moveTo(ex - 8, ey + 9); ctx.quadraticCurveTo(ex, ey + 13, ex + 8, ey + 9); ctx.strokeStyle = 'rgba(150,210,245,.95)'; ctx.lineWidth = 2.6; ctx.stroke();
+      break;
+    case 'smile':
+      open(0, 0);
+      ctx.beginPath(); ctx.moveTo(ex - 13, ey + 15); ctx.lineTo(ex - 13, ey + 8); ctx.quadraticCurveTo(ex, ey + 1, ex + 13, ey + 8); ctx.lineTo(ex + 13, ey + 15); ctx.closePath();
+      ctx.fillStyle = C.skin; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(ex - 9, ey + 8); ctx.quadraticCurveTo(ex, ey + 2.5, ex + 9, ey + 8); ctx.strokeStyle = L; ctx.lineWidth = 1.8; ctx.stroke();
+      break;
+    case 'happy':
+      ctx.beginPath(); ctx.moveTo(ex - 9, ey + 3); ctx.quadraticCurveTo(ex, ey - 10, ex + 9, ey + 3); ctx.strokeStyle = L; ctx.lineWidth = 3.6; ctx.stroke(); break;
+    case 'closed':
+      ctx.beginPath(); ctx.moveTo(ex - 9, ey - 1); ctx.quadraticCurveTo(ex, ey + 7, ex + 9, ey - 1); ctx.strokeStyle = L; ctx.lineWidth = 3.4; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ex + s * 8, ey); ctx.lineTo(ex + s * 12, ey - 3); ctx.lineWidth = 2.2; ctx.stroke(); break;
+    case 'xx':
+      ctx.beginPath(); ctx.moveTo(ex - s * 8, ey - 7); ctx.lineTo(ex + s * 6, ey); ctx.lineTo(ex - s * 8, ey + 7); ctx.strokeStyle = L; ctx.lineWidth = 3.6; ctx.stroke(); break;
+    case 'star': {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++){ const r = i % 2 ? 5 : 12, a = i / 10 * TAU - PI / 2; ctx.lineTo(ex + cos(a) * r, ey + 1 + sin(a) * r); }
+      ctx.closePath(); fs(C.eyeBot, L, 2.2); ell(ex - 2, ey - 2, 2.4, 2.4); fs('#FFFFFF'); break;
+    }
+    case 'dot': ell(ex, ey + 1, 4.4, 5.6); fs(L); ell(ex - 1.4, ey - 1, 1.4, 1.4); fs('#FFFFFF'); break;
+    case 'swirl':
+      ctx.beginPath();
+      for (let i = 0; i < 40; i++){ const a = i * .45, r = 1 + i * .23; ctx.lineTo(ex + cos(a) * r * s, ey + 1 + sin(a) * r); }
+      ctx.strokeStyle = L; ctx.lineWidth = 2; ctx.stroke(); break;
+    case 'half':
+      open(0, 2);
+      ctx.beginPath(); ctx.rect(ex - 13, ey - 18, 26, 18); ctx.fillStyle = C.skin; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(ex - 11, ey); ctx.quadraticCurveTo(ex, ey - 3, ex + 11, ey); ctx.strokeStyle = L; ctx.lineWidth = 3.4; ctx.stroke(); break;
+    case 'uneven':
+      if (s < 0) open(0, 0); else { ctx.beginPath(); ctx.moveTo(ex - 9, ey); ctx.lineTo(ex + 9, ey - 1); ctx.strokeStyle = L; ctx.lineWidth = 3.4; ctx.stroke(); }
+      break;
+    case 'wink':
+      if (s < 0) open(0, 0); else { ctx.beginPath(); ctx.moveTo(ex - 9, ey + 3); ctx.quadraticCurveTo(ex, ey - 9, ex + 9, ey + 3); ctx.strokeStyle = L; ctx.lineWidth = 3.6; ctx.stroke(); }
+      break;
+  }
+}
+function mouth(type, C, p, k){
+  const L = C.line, red = '#B8434D', tongue = '#F48A97';
+  ctx.save(); ctx.translate(0, HY + 28); ctx.scale(k, k);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = L; ctx.lineWidth = 2.4;
+  const P = () => ctx.beginPath();
+  if (type === 'chew') type = floor(p * 5) % 2 ? 'cat' : 'osmall';
+  switch (type){
+    case 'small': P(); ctx.moveTo(-3.5, 0); ctx.quadraticCurveTo(0, 3, 3.5, 0); ctx.stroke(); break;
+    case 'smile': P(); ctx.moveTo(-6, -1); ctx.quadraticCurveTo(0, 5.5, 6, -1); ctx.stroke(); break;
+    case 'open': P(); ctx.moveTo(-7, -2); ctx.quadraticCurveTo(0, -3, 7, -2); ctx.quadraticCurveTo(5, 9, 0, 9); ctx.quadraticCurveTo(-5, 9, -7, -2); ctx.closePath(); fs(red, L, 2.2); ell(0, 5.8, 3.4, 2.3); fs(tongue); break;
+    case 'big': P(); ctx.moveTo(-10, -3); ctx.lineTo(10, -3); ctx.quadraticCurveTo(9, 14, 0, 14); ctx.quadraticCurveTo(-9, 14, -10, -3); ctx.closePath(); fs(red, L, 2.2); ell(0, 9.5, 5, 3); fs(tongue); break;
+    case 'cat': P(); ctx.moveTo(-7, -1); ctx.quadraticCurveTo(-3.5, 4.5, 0, 0); ctx.quadraticCurveTo(3.5, 4.5, 7, -1); ctx.stroke(); break;
+    case 'wave': P(); ctx.moveTo(-7, 1); ctx.quadraticCurveTo(-3.5, -3, 0, 1); ctx.quadraticCurveTo(3.5, 5, 7, 1); ctx.stroke(); break;
+    case 'wave2': P(); ctx.moveTo(-3, 1); ctx.quadraticCurveTo(0, -2, 3, 1); ctx.quadraticCurveTo(5.5, 3.5, 8, 0); ctx.stroke(); break;
+    case 'frown': P(); ctx.moveTo(-6, 3); ctx.quadraticCurveTo(0, -3, 6, 3); ctx.stroke(); break;
+    case 'he': P(); ctx.moveTo(-7, 3); ctx.lineTo(-2, -2); ctx.lineTo(7, 4); ctx.stroke(); break;
+    case 'o': ell(0, 2, 3.6, 4.2); fs(red, L, 2); break;
+    case 'osmall': ell(0, 1.5, 2.6, 2.8); fs(red, L, 1.8); break;
+    case 'pout': P(); ctx.moveTo(-2, -2); ctx.quadraticCurveTo(3, -1, 0, 1.2); ctx.quadraticCurveTo(3, 3, -2, 4); ctx.stroke(); break;
+    case 'cry': P(); ctx.moveTo(-9, 0); ctx.quadraticCurveTo(0, -5, 9, 0); ctx.quadraticCurveTo(6, 11, 0, 11); ctx.quadraticCurveTo(-6, 11, -9, 0); ctx.closePath(); fs(red, L, 2.2); break;
+    case 'yawn': ell(0, 3, 4.5, 6); fs(red, L, 2); break;
+    case 'ah': ell(0, 3, 6, 7); fs(red, L, 2.2); ell(0, 7, 3.6, 2.6); fs(tongue); break;
+    case 'tongue': P(); ctx.moveTo(-6, -1); ctx.quadraticCurveTo(0, 5, 6, -1); ctx.stroke(); P(); ctx.ellipse(3, 4.2, 2.8, 3.4, 0, 0, PI); fs(tongue, L, 1.6); break;
+  }
+  ctx.restore();
+}
+function face(C, st, p, blink){
+  const E = EXPR[st.expr] || EXPR.normal;
+  let eyes = E.eyes;
+  if (blink && ['open', 'smile', 'side', 'teary'].includes(eyes)) eyes = 'closed';
+  const b = E.blush || .5;
+  for (const s of [-1, 1]){
+    ell(s * 31, HY + 22, 8.5, 4.6); ctx.fillStyle = `rgba(240,110,125,${min(.75, .32 * b)})`; ctx.fill();
+    if (b >= 1.8){
+      ctx.strokeStyle = 'rgba(220,80,100,.75)'; ctx.lineWidth = 1.4;
+      for (let i = -1; i <= 1; i++){ ctx.beginPath(); ctx.moveTo(s * 31 + i * 4 - 1.5, HY + 25); ctx.lineTo(s * 31 + i * 4 + 1.5, HY + 19); ctx.stroke(); }
+    }
+  }
+  if (E.gloom){
+    ctx.save(); ell(0, HY, 48, 43); ctx.clip();
+    const g = ctx.createLinearGradient(0, HY - 44, 0, HY - 10); g.addColorStop(0, 'rgba(120,90,190,.45)'); g.addColorStop(1, 'rgba(120,90,190,0)');
+    ctx.fillStyle = g; ctx.fillRect(-50, HY - 46, 100, 40); ctx.restore();
+  }
+  eye(eyes, -20, HY + 9, -1, C, E);
+  eye(eyes, 20, HY + 9, 1, C, E);
+  mouth(E.mouth, C, p, C.mouthK);
+  if (E.tears){
+    for (const s of [-1, 1]){
+      ctx.beginPath(); ctx.moveTo(s * 20, HY + 15); ctx.quadraticCurveTo(s * 24, HY + 30 + sin(p * 9) * 2, s * 22, HY + 44);
+      ctx.strokeStyle = 'rgba(140,200,240,.95)'; ctx.lineWidth = 4.5; ctx.lineCap = 'round'; ctx.stroke();
+    }
+  }
+}
+function brows(C, st){
+  const E = EXPR[st.expr] || EXPR.normal; if (!E.brows) return;
+  ctx.strokeStyle = C.line; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+  for (const s of [-1, 1]){
+    ctx.beginPath();
+    if (E.brows === 'angry'){ ctx.moveTo(s * 27, HY - 13); ctx.lineTo(s * 10, HY - 6); }
+    else if (E.brows === 'sad'){ ctx.moveTo(s * 27, HY - 6); ctx.lineTo(s * 10, HY - 13); }
+    else if (E.brows === 'up'){ ctx.moveTo(s * 27, HY - 13); ctx.quadraticCurveTo(s * 19, HY - 19, s * 11, HY - 14); }
+    else if (E.brows === 'tilt'){ if (s < 0){ ctx.moveTo(-27, HY - 9); ctx.lineTo(-11, HY - 10); } else { ctx.moveTo(27, HY - 17); ctx.lineTo(11, HY - 13); } }
+    ctx.stroke();
+  }
+}
+
+/* ---- 頭飾、帽子 ---- */
+function headwear(C, O, pet){
+  const L = C.line;
+  if (pet.id === 'mare'){
+    if (O.scrunchie){ for (const s of [-1, 1]){ ctx.beginPath(); ctx.arc(s * 47, HY - 20, 6, 0, TAU); ctx.strokeStyle = L; ctx.lineWidth = 6.5; ctx.stroke(); ctx.strokeStyle = O.scrunchie; ctx.lineWidth = 3.6; ctx.stroke(); } }
+    else if (!O.hood){ for (const s of [-1, 1]) bow(s * 47, HY - 24, .85, '#C8384A', L); }
+    if (O.bigBow) bow(0, HY - 58, 1.5, '#B3263A', L);
+    if (O.hat === 'straw'){
+      ctx.save(); ctx.translate(0, HY - 50); ctx.rotate(-.1);
+      ctx.beginPath(); ctx.ellipse(0, 0, 31, 21, 0, PI, 0); ctx.closePath(); fs('#F2D290', L, 2.4);
+      ctx.fillStyle = '#F2A3B5'; ctx.fillRect(-31, -6, 62, 5);
+      ell(0, 1, 62, 13); fs('#F6DC9E', L, 2.4);
+      ctx.strokeStyle = 'rgba(180,140,70,.6)'; ctx.lineWidth = 1.2; ell(0, 1, 46, 8.5); ctx.stroke();
+      ctx.restore();
+    }
+  } else {
+    if (!O.hood){
+      const r = O.bigFlower ? 10.5 : 7.5;
+      for (const s of [-1, 1]){ flower(s * 43, HY - 46, r, L); if (O.bigFlower) flower(s * 26, HY - 56, 5.5, L); }
+    } else flower(36, HY - 40, 6.5, L);
+  }
+}
+function hoodBack(C, O){
+  const L = C.line, H0 = O.hood;
+  if (H0.ears === 'bear'){ for (const s of [-1, 1]){ ell(s * 42, HY - 48, 14, 14); fs(H0.color, L, 2.6); ell(s * 42, HY - 48, 7, 7); fs('#F7C6D0'); } }
+  ell(0, HY - 4, 63, 58); fs(H0.color, L, 2.8);
+}
+function hoodFront(C, O){
+  const L = C.line, H0 = O.hood;
+  ctx.beginPath(); ctx.ellipse(0, HY - 2, 56, 52, 0, PI * 1.02, PI * 1.98);
+  ctx.lineCap = 'round'; ctx.strokeStyle = L; ctx.lineWidth = 14; ctx.stroke(); ctx.strokeStyle = H0.color; ctx.lineWidth = 9.5; ctx.stroke();
+  if (H0.ears === 'chick'){
+    ell(0, HY - 58, 15, 13); fs('#F9D96B', L, 2.4);
+    ell(-5, HY - 60, 1.8, 2.2); fs(L); ell(5, HY - 60, 1.8, 2.2); fs(L);
+    ctx.beginPath(); ctx.moveTo(-3, HY - 55); ctx.lineTo(3, HY - 55); ctx.lineTo(0, HY - 51); ctx.closePath(); fs('#F08A3C', L, 1.4);
+    ctx.beginPath(); ctx.moveTo(-2, HY - 70); ctx.quadraticCurveTo(0, HY - 78, 4, HY - 74); ctx.strokeStyle = L; ctx.lineWidth = 2; ctx.stroke();
+  }
+}
+function icePack(C){
+  rr(-22, HY - 54, 44, 14, 6); fs('#A9DDF5', C.line, 2.2);
+  ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.fillRect(-15, HY - 51, 18, 3);
+}
+
+/* ---- 身體 ---- */
+function plushie(type, x, y, r, L){
+  if (type === 'cat'){
+    for (const s of [-1, 1]){ ctx.beginPath(); ctx.moveTo(x + s * r * .85, y - r * .2); ctx.lineTo(x + s * r * .75, y - r * 1.15); ctx.lineTo(x + s * r * .2, y - r * .8); ctx.closePath(); fs('#2B2326', L, 2); }
+    ell(x, y, r, r * .85); fs('#2B2326', L, 2.2);
+    ell(x - r * .35, y - r * .05, 2.6, 2); fs('#E04A4A'); ell(x + r * .35, y - r * .05, 2.6, 2); fs('#E04A4A');
+  } else {
+    ell(x, y, r, r * .9); fs('#F9D96B', L, 2.2);
+    ell(x - r * .35, y - r * .15, 2, 2.4); fs(L); ell(x + r * .35, y - r * .15, 2, 2.4); fs(L);
+    ctx.beginPath(); ctx.moveTo(x - 4, y + 2); ctx.lineTo(x + 4, y + 2); ctx.lineTo(x, y + 7); ctx.closePath(); fs('#F08A3C', L, 1.4);
+    ell(x - r * .55, y + r * .25, 3.5, 2.2); fs('rgba(240,120,120,.55)'); ell(x + r * .55, y + r * .25, 3.5, 2.2); fs('rgba(240,120,120,.55)');
+  }
+}
+function legs(C, O, st){
+  const L = C.line, legCol = O.legs === 'skin' ? C.skin : O.legs;
+  if (st.body === 'sit'){
+    for (const s of [-1, 1]){
+      const k = st.kick ? sin(st.p * 5 + (s > 0 ? PI : 0)) * 3 : 0;
+      seg(s * 15, -18, s * 17, -6 + k, 13, (O.socks || O.boots) ? (O.socks || O.boots) : legCol, L);
+      ell(s * 19, -3 + k, 10.5, 7); fs(O.shoes, L, 2.4);
+    }
+    return;
+  }
+  for (const [i, s] of [[0, -1], [1, 1]]){
+    const lift = st.walk ? max(0, sin(st.leg + i * PI)) * 7 : 0, x = s * 11;
+    seg(x, -48, x, -11 - lift, 12.5, legCol, L);
+    if (O.boots) seg(x, -27, x, -11 - lift, 13.5, O.boots);
+    if (O.socks) seg(x, -30, x, -11 - lift, 13, O.socks);
+    ell(x + s * 1.5, -6 - lift, 10.5, 6.8); fs(O.shoes, L, 2.4);
+    if (O.laces){ ctx.strokeStyle = O.laces; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 3, -8 - lift); ctx.lineTo(x + 4, -8 - lift); ctx.stroke(); }
+  }
+}
+function body(C, O, st, pet){
+  const L = C.line; ctx.lineJoin = 'round';
+  if (O.bag === 'chick' && !st.back) plushie('chick', -30, -112, 13, L);
+  // 下半身
+  ctx.beginPath();
+  if (O.kind === 'dress'){
+    ctx.moveTo(-21, -80); ctx.quadraticCurveTo(-33, -62, -41, -44); ctx.quadraticCurveTo(0, -35, 41, -44); ctx.quadraticCurveTo(33, -62, 21, -80); ctx.closePath();
+    fs(O.skirt, L, 2.6);
+    if (O.frill){
+      ctx.beginPath(); ctx.moveTo(-41, -44);
+      for (let i = 0; i < 6; i++){ const x0 = -41 + i * 82 / 6, x1 = x0 + 82 / 6; ctx.quadraticCurveTo((x0 + x1) / 2, -32 + (i === 0 || i === 5 ? -2 : 1), x1, -44 + (i === 5 ? 0 : 2)); }
+      ctx.lineTo(41, -48); ctx.quadraticCurveTo(0, -40, -41, -48); ctx.closePath(); fs(O.frill, L, 2);
+    }
+  } else if (O.kind === 'shorts'){
+    ctx.moveTo(-22, -80); ctx.lineTo(-26, -50); ctx.lineTo(-2, -50); ctx.lineTo(0, -58); ctx.lineTo(2, -50); ctx.lineTo(26, -50); ctx.lineTo(22, -80); ctx.closePath();
+    fs(O.skirt, L, 2.6);
+  } else {
+    ctx.moveTo(-22, -80); ctx.quadraticCurveTo(-27, -60, -24, -46); ctx.lineTo(24, -46); ctx.quadraticCurveTo(27, -60, 22, -80); ctx.closePath();
+    fs(O.skirt, L, 2.6);
+  }
+  // 上衣
+  ctx.beginPath(); ctx.moveTo(-14, -115); ctx.quadraticCurveTo(-26, -113, -27, -98); ctx.lineTo(-24, -74); ctx.quadraticCurveTo(0, -69, 24, -74);
+  ctx.lineTo(27, -98); ctx.quadraticCurveTo(26, -113, 14, -115); ctx.closePath(); fs(O.top, L, 2.6);
+  if (st.back) return;
+  if (O.dots){ ctx.fillStyle = O.dots; for (const [x, y] of [[-14, -100], [10, -94], [-6, -84], [16, -82], [-18, -86], [3, -104]]){ ell(x, y, 2.4, 2.4); ctx.fill(); } }
+  if (O.trim){ ctx.strokeStyle = O.trim; ctx.lineWidth = 3.2; for (const s of [-1, 1]){ ctx.beginPath(); ctx.moveTo(s * 25, -98); ctx.lineTo(s * 23, -76); ctx.stroke(); } }
+  if (O.zip){ ctx.strokeStyle = O.zip; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(0, -113); ctx.lineTo(0, -73); ctx.stroke(); rr(-2.5, -110, 5, 7, 1.5); fs(O.zip, L, 1.2); }
+  if (O.sash){ rr(-24, -82, 48, 8, 3); fs(O.sash, L, 2); }
+  if (O.vcollar){ ctx.beginPath(); ctx.moveTo(-12, -114); ctx.lineTo(0, -100); ctx.lineTo(12, -114); ctx.strokeStyle = O.vcollar; ctx.lineWidth = 4; ctx.stroke(); }
+  if (O.bow && !O.hood) bow(0, -108, .7, O.bow, L);
+  if (O.cape){
+    ctx.beginPath(); ctx.moveTo(-16, -116); ctx.quadraticCurveTo(-32, -112, -34, -90); ctx.quadraticCurveTo(0, -80, 34, -90); ctx.quadraticCurveTo(32, -112, 16, -116); ctx.closePath();
+    fs(O.cape, L, 2.4);
+    ctx.beginPath(); ctx.moveTo(-34, -90); ctx.quadraticCurveTo(0, -80, 34, -90); ctx.strokeStyle = O.capeTrim; ctx.lineWidth = 3.4; ctx.stroke();
+    if (pet.id === 'freya') flower(0, -110, 4, L); else bow(0, -110, .55, O.capeTrim, L);
+  }
+  if (O.towel){
+    ctx.beginPath(); ctx.moveTo(-17, -114); ctx.quadraticCurveTo(0, -106, 17, -114); ctx.lineCap = 'round'; ctx.strokeStyle = L; ctx.lineWidth = 11; ctx.stroke(); ctx.strokeStyle = O.towel; ctx.lineWidth = 7.5; ctx.stroke();
+    seg(-14, -112, -13, -94, 7, O.towel, L); seg(13, -112, 12, -96, 7, O.towel, L);
+  }
+  if (O.bag === 'cat'){
+    ctx.beginPath(); ctx.moveTo(-18, -112); ctx.lineTo(24, -72); ctx.strokeStyle = '#2B2326'; ctx.lineWidth = 3; ctx.stroke();
+    plushie('cat', 27, -64, 11, L);
+  }
+}
+function arm(C, O, s, hx, hy, st){
+  const L = C.line, sx = s * 21, sy = -106, sleeve = O.top;
+  seg(sx, sy, hx, hy, 11, sleeve, L);
+  if (O.puff){ ell(sx, sy + 3, 9.5, 8.5); fs(sleeve, L, 2.2); }
+  if (O.wide){ const ux = hx + (sx - hx) * .18, uy = hy + (sy - hy) * .18; ell(ux, uy, 9.5, 8); fs(sleeve, L, 2.2); }
+  if (O.wrist){ const ux = hx + (sx - hx) * .2, uy = hy + (sy - hy) * .2; ell(ux, uy, 6.8, 6.8); fs(O.wrist, L, 2); }
+  ell(hx, hy, 7.2, 7.2); fs(C.skin, L, 2.4);
+}
+function itemPos(st, H2){
+  const [[lx, ly], [rx, ry]] = H2;
+  switch (st.itemAt){
+    case 'c': return [(lx + rx) / 2, (ly + ry) / 2 - 4];
+    case 'cup': return [(lx + rx) / 2, min(ly, ry) - 16];
+    case 'chigh': return [(lx + rx) / 2, (ly + ry) / 2 - 2];
+    case 'mouthfeed': return [6, -118];
+    default: return [rx + 4, ry - 6];
+  }
+}
+
+function drawFigure(pet, C, O, st, p, now){
+  const sitOff = st.body === 'sit' ? 24 : 0;
+  const sway = sin(now / 650) * 2 + (st.walk ? sin(st.leg) * 2 : 0);
+  const withHead = fn => { ctx.save(); ctx.translate(0, -112 + st.headDrop); ctx.rotate(st.tilt); ctx.translate(0, 112); fn(); ctx.restore(); };
+  st.p = p;
+  ctx.save(); ctx.translate(0, sitOff);
+  withHead(() => backHair(C, O, st, sway));
+  ctx.restore();
+  if (st.body !== 'tub') legs(C, O, st);
+  ctx.save(); ctx.translate(0, sitOff);
+  body(C, O, st, pet);
+  const H2 = st.back ? hands('down', p) : hands(st.pose, p);
+  const front = H2.map(h => h[1] < -112);
+  H2.forEach((h, i) => { if (!front[i]) arm(C, O, i ? 1 : -1, h[0], h[1], st); });
+  if (st.plush && !st.plushHigh){ plushie(C.plush, 0, -88, 17, C.line); H2.forEach((h, i) => { if (!front[i]) { ell(h[0], h[1], 7.2, 7.2); fs(C.skin, C.line, 2.4); } }); }
+  withHead(() => {
+    if (pet.id === 'freya' && !O.hood){ ribbons(C, O, now / 1000); buns(C); }
+    if (O.hood) hoodBack(C, O);
+    if (pet.id === 'freya') ears(C, st.ear, st.earRed);
+    if (st.back){
+      ell(0, HY - 2, 52, 48); fs(O.hood ? O.hood.color : C.hair, C.line, 2.6);
+      if (!O.hood){ ctx.strokeStyle = C.hairSh; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, HY - 48); ctx.lineTo(0, HY + 30); ctx.stroke(); }
+      headwear(C, O, pet);
+      return;
+    }
+    ell(0, HY, 48, 43); fs(C.skin, C.line, 2.8);
+    face(C, st, p, pet.blink);
+    bangs(C, st);
+    brows(C, st);
+    if (O.hood) hoodFront(C, O);
+    headwear(C, O, pet);
+    if (st.ice) icePack(C);
+  });
+  if (st.plush && st.plushHigh) plushie(C.plush, 0, -122, 18, C.line);
+  H2.forEach((h, i) => { if (front[i]) arm(C, O, i ? 1 : -1, h[0], h[1], st); });
+  if (st.item && !st.back){ const [ix, iy] = itemPos(st, H2); emoji(st.item, ix, iy, 30); }
+  ctx.restore();
+}
+
+/* ---- 正式 Sprite（如有登記） ---- */
+const spriteImgs = {};
+for (const [k, v] of Object.entries(SPRITE_OVERRIDES)){
+  const img = new Image(); img.onload = () => { spriteImgs[k] = img; }; img.src = v.src;
+}
+function drawSprite(pet, now){
+  const key = `${pet.id}_act_${pet.anim}_${pet.outfit}`, img = spriteImgs[key];
+  if (!img) return false;
+  const def = SPRITE_OVERRIDES[key], fw = img.width / def.frames, fh = img.height;
+  const f = floor((now - pet.animStart) / 1000 * def.fps) % def.frames;
+  const k = (202 * pet._S) / 200 * (256 / fh);
+  ctx.save(); ctx.translate(pet.x, pet.y); ctx.scale(pet.dir * k, k);
+  ctx.drawImage(img, f * fw, 0, fw, fh, -128, -236, 256, 256);
+  ctx.restore();
+  return true;
+}
+
+function tubBack(){ ell(0, -40, 74, 20); fs('#CDEBF7', '#5C7C8C', 2.6); }
+function tubFront(p){
+  ctx.beginPath(); ctx.moveTo(-74, -40); ctx.quadraticCurveTo(-72, 4, 0, 4); ctx.quadraticCurveTo(72, 4, 74, -40); ctx.quadraticCurveTo(0, -24, -74, -40); ctx.closePath();
+  fs('#FFFFFF', '#5C7C8C', 2.6);
+  ctx.fillStyle = '#9AD3EE'; ctx.fillRect(-60, -18, 120, 4);
+  for (let i = 0; i < 9; i++){ const x = -62 + i * 15.5, y = -42 + sin(p * 3 + i) * 2; ell(x, y, 10 + (i % 3) * 2, 8); fs('#FFFFFF', '#B8D8E6', 1.6); }
+  emoji('🐤', 52, -50, 22);
+}
+
+function drawPet(pet, now){
+  const C = CHARS[pet.id], O = OUTFITS[pet.id][pet.outfit];
+  const p = (now - pet.animStart) / 1000;
+  const st = animState(pet, p);
+  const S = .58 * C.h;
+  pet._st = st; pet._S = S;
+  if (drawSprite(pet, now)) return;
+  ctx.save(); ctx.translate(pet.x, pet.y);
+  if (st.body !== 'lie' && st.body !== 'tub'){
+    ell(0, 0, (st.body === 'sit' ? 34 : 28) * S / .58 * (1 - st.bob / 70), 6.5); ctx.fillStyle = 'rgba(110,60,70,.16)'; ctx.fill();
+  }
+  const dir = st.body === 'lie' ? 1 : pet.dir;
+  if (st.body === 'lie') ctx.rotate(-PI / 2);
+  ctx.scale(dir * S, S);
+  if (st.body === 'tub') tubBack();
+  ctx.save();
+  ctx.rotate(st.sway);
+  ctx.translate(0, -st.bob + (st.body === 'tub' ? 34 : 0));
+  if (st.squash) ctx.scale(1 + st.squash, 1 - st.squash);
+  drawFigure(pet, C, O, st, p, now);
+  ctx.restore();
+  if (st.body === 'tub') tubFront(p);
+  ctx.restore();
+  if (st.body === 'lie') drawBlanket(pet, S);
+}
+function drawBlanket(pet, S){
+  const x = pet.x - 100 * S, y = pet.y - 34 * S, w = 112 * S, h = 70 * S;
+  rr(x, y, w, h, 10); fs('#F6B9C6', '#C77F90', 2);
+  ctx.fillStyle = 'rgba(255,255,255,.7)'; for (let i = 0; i < 6; i++){ ell(x + 10 + (i % 3) * w / 3.2, y + 14 + floor(i / 3) * h / 2.4, 2.6, 2.6); ctx.fill(); }
+  rr(x - 2, y - 2, 18 * S, h + 4, 8); fs('#FFFFFF', '#C77F90', 2);
+}
+
+/* ---- 頭頂符號與對話框（螢幕座標） ---- */
+function headPt(pet){
+  const st = pet._st, S = pet._S || .58;
+  if (!st) return { x: pet.x, y: pet.y - 120 };
+  if (st.body === 'lie') return { x: pet.x - 156 * S, y: pet.y - 52 * S };
+  const sit = st.body === 'sit' ? 24 : st.body === 'tub' ? 34 : 0;
+  return { x: pet.x, y: pet.y - (214 - sit + st.bob) * S };
+}
+function txt(s, x, y, size, col, bold = true){
+  ctx.font = `${bold ? '700 ' : ''}${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.strokeText(s, x, y); ctx.fillStyle = col; ctx.fillText(s, x, y);
+}
+function drawFx(pet, now){
+  const st = pet._st; if (!st || !st.fx) return;
+  const { x, y } = headPt(pet), t = now / 1000;
+  switch (st.fx){
+    case 'zzz': for (let i = 0; i < 3; i++){ const c = (t * .6 + i / 3) % 1; ctx.globalAlpha = 1 - c; txt('Z', x + 10 + c * 22, y - c * 30, 12 + i * 3, '#7A86C8'); } ctx.globalAlpha = 1; break;
+    case 'zz': { const c = (t * .5) % 1; ctx.globalAlpha = 1 - c; txt('z', x + 26, y + 8 - c * 16, 13, '#7A86C8'); ctx.globalAlpha = 1; break; }
+    case 'note': txt('♪', x + 28 + sin(t * 3) * 3, y + 4 - abs(sin(t * 2)) * 8, 20, '#E07A92'); txt('♫', x - 30, y + 10 - abs(sin(t * 2 + 1)) * 6, 16, '#E2A13A'); break;
+    case 'heart': for (let i = 0; i < 2; i++){ const c = (t * .7 + i * .5) % 1; ctx.globalAlpha = 1 - c * .8; txt('♥', x + (i ? 24 : -22) + sin(t * 4 + i) * 3, y + 6 - c * 26, 16 + i * 3, '#EE5C7E'); } ctx.globalAlpha = 1; break;
+    case 'anger': {
+      const ax = x + 30, ay = y + 14, k = 1 + sin(t * 10) * .12;
+      ctx.strokeStyle = '#E2453C'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      for (const [dx, dy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]){ ctx.beginPath(); ctx.moveTo(ax + dx * 3 * k, ay + dy * 9 * k); ctx.quadraticCurveTo(ax + dx * 3 * k, ay + dy * 3 * k, ax + dx * 9 * k, ay + dy * 3 * k); ctx.stroke(); }
+      break;
+    }
+    case 'bang': txt('!', x + 4, y - 4 - abs(sin(t * 8)) * 3, 26, '#E2453C'); break;
+    case 'question': txt('?', x + 26, y + 2 + sin(t * 3) * 3, 22, '#6C7FD8'); break;
+    case 'gloom':
+      ctx.strokeStyle = 'rgba(120,100,180,.8)'; ctx.lineWidth = 2;
+      for (let i = -1; i <= 1; i++){ ctx.beginPath(); ctx.moveTo(x + i * 12, y + 6); for (let k = 1; k <= 4; k++) ctx.lineTo(x + i * 12 + (k % 2 ? 3 : -3), y + 6 - k * 5); ctx.stroke(); }
+      break;
+    case 'sweat': { const sx = x + 30, sy = y + 30 + (t % 1.4) * 6; ctx.beginPath(); ctx.moveTo(sx, sy - 7); ctx.quadraticCurveTo(sx + 5, sy, sx, sy + 3); ctx.quadraticCurveTo(sx - 5, sy, sx, sy - 7); fs('#9FD4F2', '#5A9CC2', 1.4); break; }
+    case 'sparkle': for (let i = 0; i < 3; i++){ const a = t * 1.5 + i * 2.1; ctx.globalAlpha = .5 + .5 * sin(t * 5 + i); txt('✦', x + cos(a) * 34, y + 30 + sin(a) * 14, 12 + (i % 2) * 4, '#F2B33D'); } ctx.globalAlpha = 1; break;
+    case 'bubbles': for (let i = 0; i < 5; i++){ const c = (t * .5 + i / 5) % 1; ctx.globalAlpha = 1 - c; ell(x - 30 + i * 15 + sin(t * 2 + i) * 4, y + 40 - c * 50, 3 + (i % 3), 3 + (i % 3)); fs('rgba(255,255,255,.85)', '#8CC8E2', 1.2); } ctx.globalAlpha = 1; break;
+  }
+}
+function wrapText(s, maxW){
+  ctx.font = `14px ${FONT}`;
+  const out = []; let cur = '';
+  for (const ch of s){ if (ctx.measureText(cur + ch).width > maxW && cur){ out.push(cur); cur = ch; } else cur += ch; }
+  if (cur) out.push(cur); return out;
+}
+const bubbleRects = [];
+function drawSpeech(pet, now){
+  if (!pet.speech || now > pet.speech.until) return;
+  const { x, y } = headPt(pet);
+  const lines = wrapText(pet.speech.text, 150);
+  ctx.font = `14px ${FONT}`;
+  const w = max(...lines.map(l => ctx.measureText(l).width)) + 22, h = lines.length * 19 + 12;
+  let bx = clamp(x - w / 2, 6, W - w - 6), by = max(6, y - h - 18);
+  for (const r of bubbleRects) if (bx < r.x + r.w && bx + w > r.x && by < r.y + r.h && by + h > r.y) by = r.y - h - 6 < 4 ? r.y + r.h + 6 : r.y - h - 6;
+  bubbleRects.push({ x: bx, y: by, w, h });
+  const a = min(1, (pet.speech.until - now) / 300);
+  ctx.globalAlpha = a;
+  rr(bx, by, w, h, 12); fs('#FFFFFF', pet.id === 'mare' ? '#E07A92' : '#E2A13A', 2);
+  ctx.beginPath(); const tx = clamp(x, bx + 14, bx + w - 14); ctx.moveTo(tx - 6, by + h - 1); ctx.lineTo(tx, by + h + 9); ctx.lineTo(tx + 6, by + h - 1); ctx.closePath();
+  ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.strokeStyle = pet.id === 'mare' ? '#E07A92' : '#E2A13A'; ctx.stroke();
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(tx - 5, by + h - 3, 10, 3);
+  ctx.fillStyle = '#4A2B31'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  lines.forEach((l, i) => ctx.fillText(l, bx + w / 2, by + 6 + 9.5 + i * 19));
+  ctx.globalAlpha = 1;
+}
+
+/* =====================================================================
+   房間
+   ===================================================================== */
+const hourNow = () => { const d = new Date(); return d.getHours() + d.getMinutes() / 60; };
+const isNight = () => { const h = hourNow(); return h >= 21 || h < 6; };
+function drawWindow(x, y, w, h, hr){
+  let top, bot, night = false;
+  if (hr >= 6 && hr < 16){ top = '#A9DAF4'; bot = '#E6F5FF'; }
+  else if (hr >= 16 && hr < 19){ top = '#F5A982'; bot = '#FCE0C4'; }
+  else { top = '#27305E'; bot = '#4A4E86'; night = true; }
+  rr(x - 6, y - 6, w + 12, h + 12, 10); fs('#FFFFFF', '#D7A9B4', 2);
+  const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, top); g.addColorStop(1, bot);
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  if (night){ ctx.fillStyle = '#FFF6C8'; ell(x + w - 20, y + 20, 9, 9); ctx.fill(); ctx.fillStyle = '#FFFFFF'; for (const [sx, sy] of [[12, 14], [30, 34], [52, 12], [20, 60], [60, 52]]){ ctx.fillRect(x + sx, y + sy, 2, 2); } }
+  else { ctx.fillStyle = 'rgba(255,255,255,.9)'; ell(x + 24, y + 30, 14, 7); ctx.fill(); ell(x + 34, y + 26, 10, 7); ctx.fill(); ell(x + 60, y + 58, 12, 6); ctx.fill(); }
+  ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x + w / 2, y); ctx.lineTo(x + w / 2, y + h); ctx.moveTo(x, y + h / 2); ctx.lineTo(x + w, y + h / 2); ctx.stroke();
+  for (const s of [0, 1]){
+    const cx = s ? x + w + 4 : x - 4;
+    ctx.beginPath(); ctx.moveTo(cx - (s ? 0 : 16), y - 10); ctx.lineTo(cx + (s ? 16 : 0), y - 10);
+    ctx.quadraticCurveTo(cx + (s ? 12 : -2), y + h * .6, cx + (s ? 18 : -18) * .2 + (s ? 10 : -10), y + h + 8);
+    ctx.lineTo(cx + (s ? 0 : 0), y + h + 8); ctx.closePath(); fs('#F4A9BA', '#D98A9E', 1.6);
+  }
+  rr(x - 14, y - 14, w + 28, 7, 3); fs('#E9C49E', '#C99A74', 1.4);
+}
+function drawRoom(now, tvOn){
+  const hr = hourNow();
+  let g = ctx.createLinearGradient(0, 0, 0, 236); g.addColorStop(0, '#FCE7EB'); g.addColorStop(1, '#F7D8DE');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, 236);
+  ctx.fillStyle = 'rgba(255,255,255,.32)'; for (let x = 6; x < W; x += 26) ctx.fillRect(x, 0, 9, 236);
+  g = ctx.createLinearGradient(0, 236, 0, H); g.addColorStop(0, '#EBCCAC'); g.addColorStop(1, '#E2BC98');
+  ctx.fillStyle = g; ctx.fillRect(0, 236, W, H - 236);
+  ctx.strokeStyle = 'rgba(150,100,70,.18)'; ctx.lineWidth = 1;
+  for (let y = 252, r = 0; y < H; y += 24, r++){ ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); for (let x = (r % 2) * 50 + 20; x < W; x += 100){ ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 24); ctx.stroke(); } }
+  ctx.fillStyle = '#EAC0C9'; ctx.fillRect(0, 230, W, 7);
+  drawWindow(172, 30, 78, 82, hr);
+  // 牆上層架
+  rr(18, 82, 92, 7, 3); fs('#E9C49E', '#C99A74', 1.4);
+  rr(26, 60, 22, 22, 4); fs('#FFFFFF', '#C99A74', 1.4); emoji('🌸', 37, 71, 14);
+  ctx.fillStyle = '#B98E6A'; rr(64, 66, 18, 16, 3); ctx.fill(); emoji('🌿', 73, 56, 22);
+  emoji('🐤', 98, 72, 16);
+  // 地毯
+  ell(186, 326, 124, 44); fs('#F9D4DC', '#EFB3C2', 2);
+  ctx.setLineDash([5, 5]); ell(186, 326, 112, 37); ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
+  // 床
+  rr(4, 146, 18, 116, 8); fs('#D2A47C', '#A67A58', 2);
+  rr(14, 228, 144, 30, 8); fs('#D9AE87', '#A67A58', 2);
+  rr(18, 192, 138, 44, 14); fs('#FFF9F7', '#D7B9BC', 2);
+  rr(22, 186, 42, 22, 10); fs('#FFFFFF', '#D7B9BC', 2);
+  if (!pets.some(p => p.sleeping || p.anim === 'care_m')){ rr(108, 196, 46, 36, 10); fs('#F6B9C6', '#C77F90', 2); }
+  // 沙發
+  rr(166, 176, 96, 48, 18); fs('#F3A9B8', '#C9798D', 2);
+  rr(160, 214, 108, 24, 10); fs('#F7BDC9', '#C9798D', 2);
+  ell(162, 220, 13, 17); fs('#F3A9B8', '#C9798D', 2); ell(266, 220, 13, 17); fs('#F3A9B8', '#C9798D', 2);
+  ctx.fillStyle = '#A67A58'; ctx.fillRect(168, 238, 6, 6); ctx.fillRect(254, 238, 6, 6);
+  // 電視櫃
+  rr(276, 196, 78, 42, 6); fs('#E3BC96', '#A67A58', 2);
+  ctx.strokeStyle = '#A67A58'; ctx.beginPath(); ctx.moveTo(315, 200); ctx.lineTo(315, 234); ctx.stroke();
+  rr(282, 146, 66, 46, 6); fs('#4A3B45', '#2E242B', 2);
+  if (tvOn){ const c = floor(now / 400) % 3; ctx.fillStyle = ['#9FD8F0', '#F9C7D3', '#FFE3A0'][c]; ctx.fillRect(287, 151, 56, 36); emoji(['🐱', '🌈', '⭐'][c], 315, 169, 18); }
+  else { ctx.fillStyle = '#5E5260'; ctx.fillRect(287, 151, 56, 36); ctx.fillStyle = 'rgba(255,255,255,.15)'; ctx.fillRect(291, 154, 14, 30); }
+  ctx.fillStyle = '#2E242B'; ctx.fillRect(310, 192, 10, 4);
+}
+function drawTable(){
+  ctx.fillStyle = '#B98A62'; ctx.fillRect(84, 346, 6, 18); ctx.fillRect(130, 346, 6, 18);
+  ell(110, 346, 46, 15); fs('#E9BC92', '#A67A58', 2);
+  ell(110, 343, 40, 11); ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.fill();
+  if (duo && duo.type === 'eat' && duo.stage === 'act'){ emoji('🍙', 92, 338, 18); emoji('🍰', 124, 338, 18); }
+  else emoji('🍵', 116, 338, 14);
+}
+function drawToys(){
+  rr(274, 334, 56, 32, 6); fs('#A8D2E6', '#5C8CA2', 2);
+  rr(270, 328, 64, 9, 4); fs('#C3E1EE', '#5C8CA2', 2);
+  emoji('🧸', 290, 326, 20); emoji('⚽', 316, 328, 16);
+}
+
+/* =====================================================================
+   角色狀態與行為
+   ===================================================================== */
+let lastInput = performance.now();
+let selected = 'mare';
+let duo = null;
+let mg = null;
+let speed = 1;
+
+class Pet {
+  constructor(id, x, y){
+    this.id = id; this.x = x; this.y = y; this.dir = id === 'mare' ? 1 : -1;
+    this.outfit = 'daily';
+    this.stats = { hunger:80, mood:75, clean:80, energy:85, health:95, affection:50 };
+    this.sleeping = false; this.sick = false;
+    this.queue = []; this.cur = null; this.target = null;
+    this.anim = 'idle'; this.animStart = performance.now();
+    this.nextThink = performance.now() + rnd(3000, 6000);
+    this.speech = null; this.prop = null;
+    this.blink = false; this.blinkAt = performance.now() + rnd(1500, 4000);
+  }
+  get other(){ return pets.find(p => p !== this); }
+  setAnim(a){ if (this.anim !== a){ this.anim = a; this.animStart = performance.now(); } }
+  say(text, dur = 3200){ this.speech = { text, until: performance.now() + dur }; }
+  run(steps){ this.queue = steps.slice(); this.cur = null; this.target = null; }
+  rest(){ return this.sleeping ? 'sleep' : this.sick ? 'sick' : 'idle'; }
+  busy(){ return !!(this.cur || this.queue.length || this.target); }
+  moveTo(x, y){ this.target = { x, y }; }
+  update(dt, now){
+    if (now > this.blinkAt){ this.blink = true; if (now > this.blinkAt + 130){ this.blink = false; this.blinkAt = now + rnd(2200, 5200); } }
+    if (this.target){
+      const dx = this.target.x - this.x, dy = this.target.y - this.y, d = hypot(dx, dy), sp = 62 * dt;
+      if (abs(dx) > 1) this.dir = dx > 0 ? 1 : -1;
+      if (d <= sp){ this.x = this.target.x; this.y = this.target.y; this.target = null; }
+      else { this.x += dx / d * sp; this.y += dy / d * sp; this.setAnim('walk'); return; }
+    }
+    if (duo && duo.members.includes(this)) return;
+    if (!this.cur && this.queue.length){
+      const c = this.cur = this.queue.shift();
+      if (c.to){ this.moveTo(c.to.x, c.to.y); }
+      c.started = false;
+      return;
+    }
+    if (this.cur){
+      const c = this.cur;
+      if (!c.started){
+        c.started = true; c.t0 = now;
+        if (c.face) this.dir = c.face;
+        if (c.prop !== undefined) this.prop = c.prop;
+        if (c.start) c.start(this);
+        if (c.say) this.say(typeof c.say === 'function' ? c.say(this) : c.say);
+        this.setAnim(c.anim || this.rest());
+      }
+      if (now - c.t0 >= (c.dur || 0)){
+        if (c.end) c.end(this);
+        this.cur = null;
+        if (!this.queue.length) this.setAnim(this.rest());
+      }
+      return;
+    }
+    if (this.anim === 'walk' || (!['idle', 'sleep', 'sick'].includes(this.anim))) this.setAnim(this.rest());
+    if (this.anim !== this.rest()) this.setAnim(this.rest());
+    think(this, now);
+  }
+}
+
+const pets = [new Pet('mare', 140, 330), new Pet('freya', 228, 334)];
+const P = id => pets.find(p => p.id === id);
+
+function eff(pet, d){
+  for (const k in d) pet.stats[k] = clamp(pet.stats[k] + d[k]);
+  if (pet.sick && pet.stats.health >= 55) pet.sick = false;
+}
+function tick(pet, minutes){
+  const s = pet.stats;
+  s.hunger -= .14 * minutes;
+  s.clean -= .08 * minutes;
+  s.energy += (pet.sleeping ? .6 : -.1) * minutes;
+  let moodDrift = -.05;
+  if (s.hunger < 30) moodDrift -= .1;
+  if (s.clean < 30) moodDrift -= .06;
+  if (s.energy < 20) moodDrift -= .06;
+  s.mood += moodDrift * minutes;
+  s.affection -= .01 * minutes;
+  if (s.hunger < 15 || s.clean < 15) s.health -= .15 * minutes; else s.health += .04 * minutes;
+  for (const k in s) s[k] = clamp(s[k], k === 'affection' ? 0 : 5, 100);
+  if (!pet.sick && s.health < 35) pet.sick = true;
+}
+
+function goSleep(pet, quiet){
+  const spot = pet.id === 'mare' ? SPOTS.bed1 : SPOTS.bed2;
+  pet.run([{ to: spot, dur: 0, end: p => { p.sleeping = true; p.setAnim('sleep'); if (!quiet) p.say(line(p, 'night'), 2000); } }]);
+}
+function wake(pet){
+  pet.sleeping = false;
+  pet.run([{ anim:'tired', dur:1600, say: line(pet, 'wake') }, { to: { x: pet.id === 'mare' ? 120 : 200, y: 300 }, dur: 0 }]);
+}
+
+function think(pet, now){
+  if (duo || mg || now < pet.nextThink) return;
+  pet.nextThink = now + rnd(4500, 9000);
+  const s = pet.stats, o = pet.other;
+  if (pet.sleeping){
+    if (s.energy >= 98 && !isNight()) wake(pet);
+    else if (random() < .12) pet.say(line(pet, 'sleepTalk'), 1800);
+    return;
+  }
+  if (pet.id === 'freya' && P('mare').sick && !pet.sick && !P('mare').sleeping && random() < .7){ startDuo('care'); return; }
+  if (pet.sick){ if (random() < .35) pet.say(line(pet, 'sick')); return; }
+  if (s.energy < 15 || (isNight() && s.energy < 55)){ goSleep(pet); return; }
+  const absent = now - lastInput > 60000;
+  if (absent && random() < .35){ pet.run([{ anim: random() < .5 ? 'search' : 'wait', dur: 5200, say: line(pet, 'wait') }]); return; }
+  if (s.hunger < 25 && random() < .6){ pet.run([{ anim:'sad', dur:2600, say: line(pet, 'hungry') }]); return; }
+  if (s.clean < 25 && random() < .5){ pet.run([{ anim:'pout', dur:2400, say: line(pet, 'dirty') }]); return; }
+  if (s.energy < 30 && random() < .5){ pet.run([{ anim:'tired', dur:2600, say: line(pet, 'sleepy') }]); return; }
+  if (pet.id === 'mare' && s.affection > 55 && random() < .12){
+    pet.run([{ to: SPOTS.front1, dur:0 }, { anim:'mare_spoiled', dur:3600, say: line(pet, 'spoiled'), end: p => eff(p, { affection:2 }) }]); return;
+  }
+  if (pet.id === 'mare' && s.mood > 50 && random() < .07 && !o.busy() && !o.sleeping && !o.sick){ startDuo('prank'); return; }
+  if (pet.id === 'freya' && random() < .1){ pet.run([{ anim:'confused', dur:2600, say: line(pet, 'confused') }]); return; }
+  const r = random();
+  if (r < .35) pet.run([{ to: { x: rnd(40, 320), y: rnd(272, 386) }, dur: 0 }]);
+  else if (r < .47) pet.run([{ to: SPOTS.toys, dur:0, face:1 }, { anim:'play_toy', dur:4000, end: p => eff(p, { mood:4, energy:-2 }) }]);
+  else if (r < .55) pet.run([{ anim:'groom', dur:3000, end: p => eff(p, { clean:4 }) }]);
+  else if (r < .63) pet.run([{ to: SPOTS.window, dur:0 }, { anim:'idle', dur:3000 }]);
+  else if (r < .72 && s.mood > 65) pet.run([{ anim:'happy', dur:2000 }]);
+  else if (r < .8) pet.run([{ to: pet.id === 'mare' ? SPOTS.sofa1 : SPOTS.sofa2, dur:0 }, { anim:'idle', dur:4000 }]);
+}
+
+/* ---------- 雙人互動 ---------- */
+const DUO = {
+  play:  { label:'一起玩', dur:6500, spots:{ mare:{x:122,y:330}, freya:{x:244,y:330} }, faces:{ mare:1, freya:-1 }, anims:{ mare:'duo_play', freya:'duo_play' },
+           say:{ mare:'接住喔～！', freya:'看我的！' }, eff:{ mood:15, energy:-8, affection:3 } },
+  eat:   { label:'一起吃', dur:6500, spots:{ mare:SPOTS.table2, freya:SPOTS.table1 }, faces:{ mare:-1, freya:1 }, anims:{ mare:'duo_eaten', freya:'duo_feed' },
+           say:{ mare:'啊～嗯！好好吃！', freya:'來，啊～' }, eff:{ hunger:30, mood:8 } },
+  tv:    { label:'看電視', dur:8000, spots:{ mare:SPOTS.tv1, freya:SPOTS.tv2 }, faces:{ mare:1, freya:-1 }, anims:{ mare:'tv', freya:'tv' },
+           say:{ mare:'這集好好笑！', freya:'呵呵，對吧～' }, eff:{ mood:12, energy:-2 } },
+  care:  { label:'芙蕾雅照顧小馬蕾', dur:6500, spots:{ mare:SPOTS.bed1, freya:SPOTS.careF }, faces:{ mare:1, freya:-1 }, anims:{ mare:'care_m', freya:'care' },
+           say:{ freya: LINES.freya.care[0], mare:'…謝謝妳，芙蕾雅。' }, eff:null },
+  sleep: { label:'一起睡', dur:0, spots:{ mare:SPOTS.bed1, freya:SPOTS.bed2 }, faces:{ mare:1, freya:1 }, anims:{ mare:'sleep', freya:'sleep' }, say:{}, eff:null },
+  prank: { label:'惡作劇', dur:6200, spots:null, faces:null, anims:null, say:{}, eff:null }
+};
+function startDuo(type){
+  const m = P('mare'), f = P('freya'), D = DUO[type];
+  for (const p of pets){ p.queue = []; p.cur = null; if (type !== 'care' || p.id !== 'mare') p.sleeping = false; }
+  let spots = D.spots;
+  if (type === 'prank'){ const side = f.x > 180 ? -46 : 46; spots = { mare: { x: clamp(f.x + side, 30, 330), y: f.y + 2 }, freya: { x: f.x, y: f.y } }; }
+  m.moveTo(spots.mare.x, spots.mare.y); f.moveTo(spots.freya.x, spots.freya.y);
+  duo = { type, stage:'gather', t0:0, members:[m, f], spots };
+}
+function updateDuo(now){
+  if (!duo) return;
+  const m = P('mare'), f = P('freya'), D = DUO[duo.type];
+  if (duo.stage === 'gather'){
+    if (m.target || f.target) return;
+    duo.stage = 'act'; duo.t0 = now;
+    if (duo.type === 'prank'){ m.dir = f.x > m.x ? 1 : -1; return; }
+    m.dir = D.faces.mare; f.dir = D.faces.freya;
+    m.setAnim(D.anims.mare); f.setAnim(D.anims.freya);
+    if (duo.type === 'sleep'){ m.sleeping = f.sleeping = true; m.say(LINES.mare.night[0], 2000); setTimeout(() => f.say(LINES.freya.night[0], 2200), 900); duo = null; return; }
+    if (D.say.freya) f.say(D.say.freya);
+    if (D.say.mare) setTimeout(() => m.say(D.say.mare), 1600);
+    return;
+  }
+  const e = (now - duo.t0) / 1000;
+  if (duo.type === 'prank'){
+    if (e < 2.4){ m.setAnim('mare_prank'); if (!duo.s1){ duo.s1 = 1; m.say(LINES.mare.prank[0], 2200); } }
+    else if (e < 3.8){ f.dir = m.x > f.x ? 1 : -1; f.setAnim('surprised'); m.setAnim('mare_prank'); if (!duo.s2){ duo.s2 = 1; f.say(LINES.freya.bug[0], 1600); } }
+    else { f.setAnim('angry'); m.setAnim('happy'); if (!duo.s3){ duo.s3 = 1; f.say(LINES.freya.scold[0], 2000); setTimeout(() => m.say('嘿嘿，對不起嘛～', 2000), 900); } }
+  }
+  if (duo.type === 'care' && e > 3) f.setAnim('care');
+  if (e * 1000 >= D.dur){
+    if (D.eff) for (const p of pets) eff(p, D.eff);
+    if (duo.type === 'care'){ eff(m, { health:35, mood:10 }); eff(f, { affection:3 }); m.sick = m.stats.health < 55; m.sleeping = true; }
+    if (duo.type === 'prank'){ eff(m, { mood:6 }); eff(f, { mood:-3 }); }
+    m.setAnim(m.rest()); f.setAnim(f.rest());
+    duo = null;
+  }
+}
+function drawDuoFx(now){
+  if (!duo || duo.stage !== 'act') return;
+  const e = (now - duo.t0) / 1000, m = P('mare'), f = P('freya');
+  if (duo.type === 'play'){
+    const c = (e / 1.6) % 1, fwd = floor(e / 1.6) % 2 === 0;
+    const a = fwd ? m : f, b = fwd ? f : m;
+    const x = a.x + (b.x - a.x) * c, y = (a.y + b.y) / 2 - 72 - sin(c * PI) * 46;
+    emoji('⚽', x, y, 20);
+  }
+  if (duo.type === 'prank' && e > .8){
+    const hp = headPt(f); emoji('🐛', hp.x + 14, hp.y + 22 + (e < 2.4 ? 0 : -abs(sin(e * 10)) * 6), 18);
+  }
+}
+
+/* ---------- 小遊戲：接點心 ---------- */
+const GOOD = ['🍓', '🍰', '🍬', '🍮', '🍩'];
+function startMinigame(pet){
+  for (const p of pets){ p.queue = []; p.cur = null; p.target = null; }
+  duo = null;
+  mg = { pet, t0: performance.now(), score: 0, items: [], spawn: 0, px: 180, tx: 180, done: false, saved: { x: pet.x, y: pet.y } };
+  pet.x = 180; pet.y = 388; pet.setAnim('mg_run');
+  document.getElementById('hint').textContent = '左右拖曳或用方向鍵移動，接住點心、避開蟲子！';
+}
+function updateMinigame(dt, now){
+  const g = mg, pet = g.pet, e = (now - g.t0) / 1000;
+  if (g.done){ if (now > g.doneAt) endMinigame(); return; }
+  g.px += (g.tx - g.px) * min(1, dt * 12);
+  pet.dir = g.tx >= pet.x ? 1 : -1; pet.x = g.px;
+  g.spawn -= dt;
+  if (g.spawn <= 0 && e < 19){ g.spawn = rnd(.38, .62); const bad = random() < .17; g.items.push({ x: rnd(24, W - 24), y: 64, v: rnd(95, 150) + e * 4, ch: bad ? '🐛' : pick(GOOD), bad }); }
+  for (const it of g.items){
+    it.y += it.v * dt;
+    if (!it.hit && it.y > 300 && it.y < 340 && abs(it.x - g.px) < 34){
+      it.hit = true;
+      if (it.bad){ g.score = max(0, g.score - 2); pet.setAnim('surprised'); pet.say(pet.id === 'freya' ? '呀！蟲子！' : '哇！', 900); setTimeout(() => mg && !mg.done && pet.setAnim('mg_run'), 600); }
+      else { g.score++; g.pop = { x: it.x, y: it.y, t: now }; }
+    }
+  }
+  g.items = g.items.filter(it => !it.hit && it.y < H + 30);
+  if (e >= 20){
+    g.done = true; g.doneAt = now + 2600; pet.setAnim(g.score >= 12 ? 'excited' : 'happy');
+    pet.say(g.score >= 12 ? `接到 ${g.score} 個！太厲害了吧！` : `接到 ${g.score} 個～好好玩！`, 2600);
+  }
+}
+function endMinigame(){
+  const g = mg, pet = g.pet;
+  eff(pet, { mood: min(30, g.score * 1.6), energy: -10, hunger: -6, affection: 2 });
+  pet.x = g.saved.x; pet.y = g.saved.y < 260 ? 320 : g.saved.y; pet.setAnim(pet.rest());
+  mg = null; document.getElementById('hint').textContent = '點角色選擇 · 點頭可以摸頭';
+  save(); renderUI();
+}
+function drawMinigame(now){
+  const g = mg, e = (now - g.t0) / 1000;
+  const grad = ctx.createLinearGradient(0, 0, 0, H); grad.addColorStop(0, '#FDE7EC'); grad.addColorStop(1, '#FBE8C9');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(255,255,255,.5)'; for (let i = 0; i < 8; i++){ ell((i * 53 + now / 40) % (W + 40) - 20, 40 + (i % 3) * 22, 18, 7); ctx.fill(); }
+  ctx.fillStyle = '#EAC9A6'; ctx.fillRect(0, 392, W, 8);
+  for (const it of g.items) emoji(it.ch, it.x, it.y, 26);
+  drawPet(g.pet, now); drawSpeech(g.pet, now);
+  if (g.pop && now - g.pop.t < 500){ ctx.globalAlpha = 1 - (now - g.pop.t) / 500; txt('+1', g.pop.x, g.pop.y - 20 - (now - g.pop.t) / 20, 18, '#E07A92'); ctx.globalAlpha = 1; }
+  rr(10, 10, 132, 34, 17); fs('rgba(255,255,255,.92)', '#EFB3C2', 1.5);
+  ctx.fillStyle = '#4A2B31'; ctx.font = `15px ${FONT}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(`接點心　${g.score} 個`, 22, 27);
+  rr(W - 82, 10, 72, 34, 17); fs('rgba(255,255,255,.92)', '#EFB3C2', 1.5);
+  ctx.textAlign = 'center'; ctx.fillText(`${max(0, 20 - floor(e))} 秒`, W - 46, 27);
+}
+
+/* =====================================================================
+   玩家操作
+   ===================================================================== */
+const toastEl = document.getElementById('toast');
+let toastT;
+function toast(msg){ toastEl.textContent = msg; toastEl.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => toastEl.hidden = true, 2400); }
+
+function prep(pet, allowSleeping){
+  lastInput = performance.now();
+  if (mg){ toast('小遊戲進行中'); return false; }
+  if (duo && duo.members.includes(pet)){ duo = null; for (const p of pets) p.setAnim(p.rest()); }
+  if (pet.sleeping && !allowSleeping){ toast(`${CHARS[pet.id].name}正在睡覺。先按「起床」叫醒她吧。`); return false; }
+  return true;
+}
+function doAction(type, arg){
+  const pet = P(selected), C = CHARS[pet.id];
+  switch (type){
+    case 'feed':
+      if (!prep(pet)) return;
+      pet.run([
+        { anim:'fed', dur:1100, prop: arg.icon, say:'啊～' },
+        { anim:'eat', dur:2600, say: p => line(p, 'fed'), end: p => {
+            eff(p, arg.fx);
+            if (arg.sweet && p.id === 'mare') eff(p, { mood:5 });
+            if (p.id === 'freya') eff(p, { mood:3 });
+            eff(p, { affection:1 }); p.prop = null;
+          } }
+      ]); break;
+    case 'drink':
+      if (!prep(pet)) return;
+      pet.run([{ anim:'drink', dur:2200, say: line(pet, 'drink'), end: p => eff(p, { hunger:6, health:3 }) }]); break;
+    case 'bath':
+      if (!prep(pet)) return;
+      pet.run([{ anim:'bath', dur:4200, say: line(pet, 'bath'), end: p => eff(p, { clean:100, mood:6 }) }]); break;
+    case 'sleep':
+      lastInput = performance.now();
+      if (mg) return;
+      if (duo && duo.members.includes(pet)) duo = null;
+      if (pet.sleeping) wake(pet); else goSleep(pet);
+      break;
+    case 'groom':
+      if (!prep(pet)) return;
+      pet.run([{ anim:'groom', dur:3000, say: line(pet, 'groom'), end: p => eff(p, { clean:15, mood:4 }) }]); break;
+    case 'medicine':
+      if (!prep(pet, true)) return;
+      if (!pet.sick && pet.stats.health > 70){ pet.say(line(pet, 'healthy')); return; }
+      pet.sleeping = false;
+      pet.run([{ anim:'sick', dur:1500, say: line(pet, 'medicine') }, { anim:'smile', dur:1200, end: p => { eff(p, { health:45 }); } }]); break;
+    case 'pat':
+      if (!prep(pet, true)) return;
+      if (pet.sleeping){ pet.say(line(pet, 'sleepTalk'), 1800); eff(pet, { mood:2, affection:1 }); return; }
+      pet.run([{ anim:'headpat', dur:2200, say: line(pet, 'pat'), end: p => eff(p, { mood:6, affection:4 }) }]); break;
+    case 'praise':
+      if (!prep(pet)) return;
+      if (pet.id === 'freya') pet.run([{ anim:'freya_flustered', dur:3400, say: line(pet, 'praise'), end: p => eff(p, { mood:8, affection:3 }) }]);
+      else pet.run([{ anim:'happy', dur:1400, say: line(pet, 'praise') }, { anim:'mare_spoiled', dur:2600, end: p => eff(p, { mood:8, affection:3 }) }]);
+      break;
+    case 'toy':
+      if (!prep(pet)) return;
+      pet.run([{ to: SPOTS.toys, dur:0, face:1 }, { anim:'play_toy', dur:4000, say: line(pet, 'toy'), end: p => eff(p, { mood:15, energy:-8, clean:-4, hunger:-3 }) }]); break;
+    case 'minigame':
+      if (!prep(pet)) return;
+      if (pet.stats.energy < 15){ pet.run([{ anim:'tired', dur:2000, say: line(pet, 'sleepy') }]); return; }
+      startMinigame(pet); break;
+    case 'call':
+      lastInput = performance.now();
+      if (mg) return;
+      duo = null;
+      pets.forEach((p, i) => {
+        if (p.sleeping) return;
+        p.run([{ to: i ? SPOTS.front2 : SPOTS.front1, dur:0 }, { anim:'wave', dur:2200, say: line(p, 'greet') }]);
+      });
+      break;
+    case 'outfit':
+      if (!prep(pet, true)) return;
+      pet.outfit = arg;
+      if (!pet.sleeping) pet.run([{ anim:'happy', dur:1600, say: line(pet, 'outfit') }]);
+      break;
+    case 'duo': {
+      lastInput = performance.now();
+      if (mg) return;
+      const m = P('mare'), f = P('freya');
+      if (arg === 'care' && f.sick){ toast('芙蕾雅自己也生病了，先讓她吃藥吧。'); return; }
+      if (arg !== 'sleep' && arg !== 'care' && (m.sick || f.sick)){ toast('有人生病了，先照顧她吧。'); return; }
+      startDuo(arg); break;
+    }
+  }
+  save(); renderUI();
+}
+
+/* ---------- 畫面點擊 ---------- */
+function toLocal(ev){
+  const r = cv.getBoundingClientRect();
+  return { x: (ev.clientX - r.left) / r.width * W, y: (ev.clientY - r.top) / r.height * H };
+}
+cv.addEventListener('pointerdown', ev => {
+  const { x, y } = toLocal(ev);
+  lastInput = performance.now();
+  if (mg){ mg.tx = clamp(x, 26, W - 26); return; }
+  const hit = [...pets].sort((a, b) => b.y - a.y).find(p => {
+    const st = p._st, S = p._S || .58;
+    if (st && st.body === 'lie') return x > p.x - 170 * S && x < p.x + 10 && abs(y - p.y) < 50 * S;
+    const top = headPt(p).y;
+    return abs(x - p.x) < 40 && y > top - 4 && y < p.y + 6;
+  });
+  if (!hit) return;
+  const wasSel = selected === hit.id;
+  selected = hit.id; renderUI();
+  const st = hit._st, top = headPt(hit).y;
+  const onHead = st && st.body !== 'lie' ? y < top + 62 * (hit._S || .58) / .58 * .9 : x < hit.x - 100 * (hit._S || .58);
+  if (onHead && (wasSel || true)) doAction('pat');
+});
+cv.addEventListener('pointermove', ev => { if (mg && (ev.buttons || ev.pointerType !== 'mouse')){ mg.tx = clamp(toLocal(ev).x, 26, W - 26); } });
+window.addEventListener('keydown', ev => {
+  if (!mg) return;
+  if (ev.key === 'ArrowLeft'){ mg.tx = clamp(mg.tx - 44, 26, W - 26); ev.preventDefault(); }
+  if (ev.key === 'ArrowRight'){ mg.tx = clamp(mg.tx + 44, 26, W - 26); ev.preventDefault(); }
+});
+
+/* =====================================================================
+   介面
+   ===================================================================== */
+const STAT_LABEL = [['hunger', '飽足'], ['mood', '心情'], ['clean', '清潔'], ['energy', '精力'], ['health', '健康'], ['affection', '親密']];
+const ANIM_LABEL = { eat:'吃東西', fed:'被餵食', drink:'喝水', bath:'洗澡中', groom:'整理儀容', play_toy:'玩玩具', headpat:'被摸頭', minigame:'玩小遊戲',
+  mare_spoiled:'撒嬌中', freya_flustered:'害羞中', mare_prank:'惡作劇', confused:'迷糊中', search:'找你中', wait:'等你中', walk:'散步', tired:'好睏',
+  happy:'開心', sad:'難過', pout:'委屈', angry:'生氣', surprised:'嚇一跳', care:'照顧小馬蕾', care_m:'被照顧', tv:'看電視', duo_play:'一起玩', duo_feed:'餵小馬蕾', duo_eaten:'一起吃', wave:'揮手', mg_run:'接點心', excited:'超開心' };
+function stateLabel(pet){
+  if (mg && mg.pet === pet) return ['接點心', false];
+  if (pet.sick) return ['生病了', true];
+  if (pet.sleeping) return ['睡覺中', false];
+  if (ANIM_LABEL[pet.anim]) return [ANIM_LABEL[pet.anim], false];
+  const s = pet.stats;
+  if (s.hunger < 25) return ['肚子餓', true];
+  if (s.clean < 25) return ['想洗澡', true];
+  if (s.energy < 25) return ['想睡覺', true];
+  if (s.mood < 30) return ['不開心', true];
+  if (s.mood > 75) return ['心情很好', false];
+  return ['悠閒中', false];
+}
+function buildCards(){
+  for (const pet of pets){
+    const el = document.getElementById('card-' + pet.id);
+    el.innerHTML = `<div class="card-head"><span class="card-name">${CHARS[pet.id].name}</span><span class="chip"></span></div>
+      <div class="bars">${STAT_LABEL.map(([k, l]) => `<div class="bar" data-k="${k}"><span>${l}</span><i><b></b></i></div>`).join('')}</div>`;
+    el.addEventListener('click', () => { selected = pet.id; lastInput = performance.now(); renderUI(); });
+  }
+}
+function renderCards(){
+  for (const pet of pets){
+    const el = document.getElementById('card-' + pet.id);
+    el.setAttribute('aria-pressed', String(selected === pet.id));
+    const [lab, warn] = stateLabel(pet);
+    const chip = el.querySelector('.chip'); chip.textContent = lab; chip.classList.toggle('warn', warn);
+    for (const [k] of STAT_LABEL){
+      const v = pet.stats[k], row = el.querySelector(`[data-k="${k}"]`);
+      row.querySelector('b').style.width = v.toFixed(0) + '%';
+      row.classList.toggle('low', v < 25);
+    }
+    el.setAttribute('aria-label', `${CHARS[pet.id].name}，${lab}。` + STAT_LABEL.map(([k, l]) => `${l} ${pet.stats[k].toFixed(0)}`).join('，'));
+  }
+}
+let tab = 'care';
+function renderActions(){
+  const pet = P(selected), name = CHARS[pet.id].name;
+  document.getElementById('target').innerHTML = tab === 'duo' ? '對象：<b>兩個人</b>' : `對象：<b>${name}</b>`;
+  const box = document.getElementById('actions');
+  const btn = (ic, lb, act, arg, sub, on) => `<button class="act${on ? ' on' : ''}" type="button" data-act="${act}" data-arg="${arg ?? ''}"><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${lb}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</button>`;
+  let h = '';
+  if (tab === 'care'){
+    h += btn('🍙', '餵食', 'feedMenu');
+    h += btn('🥛', '喝水', 'drink');
+    h += btn('🛁', '洗澡', 'bath');
+    h += btn(pet.sleeping ? '☀️' : '🌙', pet.sleeping ? '起床' : '睡覺', 'sleep');
+    h += btn('🪞', '整理', 'groom');
+    h += btn('💊', '吃藥', 'medicine', '', pet.sick ? '生病中' : '');
+  } else if (tab === 'play'){
+    h += btn('🤚', '摸頭', 'pat');
+    h += btn('✨', '稱讚', 'praise', '', pet.id === 'freya' ? '會害羞' : '');
+    h += btn('🧸', '玩玩具', 'toy');
+    h += btn('🍓', '接點心', 'minigame', '', '小遊戲');
+    h += btn('📣', '呼喚', 'call', '', '兩人');
+    h += btn(pet.id === 'mare' ? '🐈‍⬛' : '🐤', pet.id === 'mare' ? '撒嬌時間' : '看看她', 'special');
+  } else if (tab === 'duo'){
+    h += btn('⚽', '一起玩', 'duo', 'play');
+    h += btn('🍰', '一起吃', 'duo', 'eat', '芙蕾雅餵食');
+    h += btn('🛏️', '一起睡', 'duo', 'sleep');
+    h += btn('📺', '看電視', 'duo', 'tv');
+    h += btn('🩹', '照顧', 'duo', 'care', '芙蕾雅→小馬蕾');
+    h += btn('🐛', '惡作劇', 'duo', 'prank', '小馬蕾的');
+  } else {
+    for (const k of OUTFIT_KEYS) h += btn(OUTFIT_ICON[k], OUTFIT_LABEL[k], 'outfit', k, '', pet.outfit === k);
+  }
+  box.innerHTML = h;
+}
+document.getElementById('actions').addEventListener('click', ev => {
+  const b = ev.target.closest('.act'); if (!b) return;
+  const act = b.dataset.act, arg = b.dataset.arg;
+  if (act === 'feedMenu') return openFeed();
+  if (act === 'special'){
+    const pet = P(selected);
+    if (!prep(pet)) return;
+    if (pet.id === 'mare') pet.run([{ to: SPOTS.front1, dur:0 }, { anim:'mare_spoiled', dur:3600, say: line(pet, 'spoiled'), end: p => eff(p, { affection:3, mood:4 }) }]);
+    else pet.run([{ anim:'confused', dur:2400, say: line(pet, 'confused') }, { anim:'smile', dur:1500, say:'啊，想起來了～' }]);
+    renderUI(); return;
+  }
+  doAction(act, arg);
+});
+document.querySelector('.tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('.tab'); if (!b) return;
+  tab = b.dataset.tab;
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t === b)));
+  renderActions();
+});
+function renderUI(){ renderCards(); renderActions(); }
+
+/* ---------- 底部選單 ---------- */
+const sheet = document.getElementById('sheet'), sheetBody = document.getElementById('sheetBody');
+function openSheet(html, bind){ sheetBody.innerHTML = html; sheet.hidden = false; bind && bind(); sheetBody.querySelector('button')?.focus(); }
+function closeSheet(){ sheet.hidden = true; }
+sheet.addEventListener('click', ev => { if (ev.target === sheet || ev.target.closest('[data-close]')) closeSheet(); });
+window.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !sheet.hidden) closeSheet(); });
+function openFeed(){
+  const pet = P(selected);
+  openSheet(`<h2>要給${CHARS[pet.id].name}吃什麼？</h2>
+    <div class="opts">${FOODS.map(f => `<button class="opt" type="button" data-food="${f.id}"><span class="ic" aria-hidden="true">${f.icon}</span><span class="t">${f.name}<small>${f.desc}${f.sweet && pet.id === 'mare' ? ' · 最愛甜食' : ''}</small></span></button>`).join('')}</div>
+    <button class="close" type="button" data-close>取消</button>`, () => {
+    sheetBody.querySelectorAll('[data-food]').forEach(b => b.addEventListener('click', () => { closeSheet(); doAction('feed', FOODS.find(f => f.id === b.dataset.food)); }));
+  });
+}
+document.getElementById('btnSettings').addEventListener('click', openSettings);
+function openSettings(){
+  let armed = false;
+  openSheet(`<h2>設定</h2>
+    <p>時間流速會影響飽足、清潔、精力等數值下降的速度。測試時可以調快。</p>
+    <div class="seg">${[1, 10, 60].map(v => `<button class="opt" type="button" data-speed="${v}" aria-pressed="${speed === v}">${v}×</button>`).join('')}</div>
+    <p>目前角色是依照規格書（2.3 頭身、表情疊加）即時繪製的佔位版本。正式 Sprite 完成後，照命名規則登記到 SPRITE_OVERRIDES 就會自動替換。</p>
+    <button class="danger" type="button" id="btnReset">重新開始（清除存檔）</button>
+    <button class="close" type="button" data-close>完成</button>`, () => {
+    sheetBody.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => {
+      speed = +b.dataset.speed; sheetBody.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); save();
+    }));
+    const r = sheetBody.querySelector('#btnReset');
+    r.addEventListener('click', () => {
+      if (!armed){ armed = true; r.textContent = '再按一次確認清除'; return; }
+      resetGame(); closeSheet(); toast('已重新開始');
+    });
+  });
+}
+
+/* =====================================================================
+   存檔（登入時存到雲端個人空間，否則存在這台裝置）
+   ===================================================================== */
+const LS_KEY = 'mare-freya-pet-v1';
+let cloudDoc = null;
+function serialize(){
+  return { v:1, savedAt: Date.now(), speed,
+    pets: Object.fromEntries(pets.map(p => [p.id, { stats: { ...p.stats }, outfit: p.outfit, sleeping: p.sleeping, sick: p.sick, x: p.x, y: p.y }])) };
+}
+function applySave(d, catchUp = true){
+  if (!d || !d.pets) return;
+  speed = d.speed || 1;
+  for (const p of pets){
+    const s = d.pets[p.id]; if (!s) continue;
+    Object.assign(p.stats, s.stats); p.outfit = OUTFIT_KEYS.includes(s.outfit) ? s.outfit : 'daily';
+    p.sleeping = !!s.sleeping; p.sick = !!s.sick;
+    if (p.sleeping){ const b = p.id === 'mare' ? SPOTS.bed1 : SPOTS.bed2; p.x = b.x; p.y = b.y; }
+    else if (typeof s.x === 'number'){ p.x = clamp(s.x, 30, 330); p.y = clamp(s.y, 262, 390); }
+    p.queue = []; p.cur = null; p.target = null; p.setAnim(p.rest());
+  }
+  if (catchUp){
+    const mins = min(12 * 60, max(0, (Date.now() - d.savedAt) / 60000) * speed);
+    for (let i = 0; i < mins; i++) pets.forEach(p => tick(p, 1));
+    return mins;
+  }
+  return 0;
+}
+let saveTimer = 0;
+function save(){
+  const d = serialize();
+  try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch (e) {}
+  const now = Date.now();
+  if (cloudDoc && now - saveTimer > 8000){ saveTimer = now; cloudDoc.set(d).catch(() => {}); }
+}
+function resetGame(){
+  for (const p of pets){ p.stats = { hunger:80, mood:75, clean:80, energy:85, health:95, affection:50 }; p.outfit = 'daily'; p.sleeping = p.sick = false; p.queue = []; p.cur = null; p.target = null; p.setAnim('idle'); }
+  P('mare').x = 140; P('mare').y = 330; P('freya').x = 228; P('freya').y = 334;
+  duo = null; mg = null; speed = 1; saveTimer = 0; save(); renderUI(); greet();
+}
+function greet(){
+  pets.forEach((p, i) => { if (!p.sleeping && !p.sick) p.run([{ anim:'wave', dur:2400, say: line(p, 'greet') }]); });
+}
+async function connectCloud(){
+  try {
+    const cl = window.claude; if (!cl || !cl.use) return;
+    const [db, user] = await Promise.all([cl.use('db'), cl.use('user')]);
+    if (!db || !user) return;
+    const id = await user.id(); if (!id) return;
+    cloudDoc = db.collection('data/users/' + id).doc('pet-save');
+    const snap = await cloudDoc.get();
+    if (snap.exists){
+      const d = snap.data();
+      if (d && d.savedAt > (bootSavedAt || 0)){ applySave(d); renderUI(); }
+    }
+    saveTimer = 0; save();
+  } catch (e) { cloudDoc = null; }
+}
+
+/* =====================================================================
+   主迴圈
+   ===================================================================== */
+let last = performance.now(), uiT = 0, saveT = 0, bootSavedAt = 0;
+function frame(now){
+  const dt = min(.1, (now - last) / 1000); last = now;
+  if (mg) updateMinigame(dt, now);
+  else {
+    updateDuo(now);
+    for (const p of pets){ tick(p, dt / 60 * speed); p.update(dt, now); }
+  }
+  ctx.clearRect(0, 0, W, H);
+  if (mg) drawMinigame(now);
+  else {
+    const tvOn = duo && duo.type === 'tv' && duo.stage === 'act';
+    drawRoom(now, tvOn);
+    const list = [...pets.map(p => ({ y: p.y, d: () => drawPet(p, now) })), { y: 352, d: drawTable }, { y: 362, d: drawToys }];
+    list.sort((a, b) => a.y - b.y).forEach(o => o.d());
+    drawDuoFx(now);
+    if (isNight()){ ctx.fillStyle = 'rgba(40,30,90,.16)'; ctx.fillRect(0, 0, W, H); }
+    for (const p of pets) drawFx(p, now);
+    bubbleRects.length = 0;
+    for (const p of [...pets].sort((a, b) => (a.speech?.until || 0) - (b.speech?.until || 0))) drawSpeech(p, now);
+  }
+  uiT += dt; saveT += dt;
+  if (uiT > .5){ uiT = 0; renderCards(); }
+  if (saveT > 15){ saveT = 0; save(); }
+  requestAnimationFrame(frame);
+}
+function clock(){
+  const d = new Date(), h = d.getHours();
+  const part = h < 6 ? '深夜' : h < 11 ? '早上' : h < 14 ? '中午' : h < 18 ? '下午' : h < 21 ? '傍晚' : '晚上';
+  document.getElementById('clock').textContent = `${part} ${String(h).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} · 時間流速 ${speed}×`;
+}
+
+function start(hotData){
+  buildCards();
+  let d = hotData && hotData.save;
+  let fromHot = !!d;
+  if (!d){ try { d = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) { d = null; } }
+  if (d){
+    bootSavedAt = d.savedAt || 0;
+    const away = applySave(d, !fromHot);
+    if (!fromHot && away > 10) setTimeout(greet, 700);
+  } else setTimeout(greet, 700);
+  if (hotData && hotData.selected) selected = hotData.selected;
+  renderUI(); clock(); setInterval(clock, 15000);
+  requestAnimationFrame(t => { last = t; frame(t); });
+  connectCloud();
+  window.addEventListener('pagehide', save);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+}
+try { window.claude?.hot?.snapshot?.(() => ({ save: serialize(), selected })); } catch (e) {}
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>
