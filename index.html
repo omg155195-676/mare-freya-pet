@@ -63,7 +63,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14p
 .bar.low i b{background:var(--low)!important}
 
 .stage-wrap{position:relative;border-radius:22px;overflow:hidden;background:#F7D9DF;box-shadow:0 0 0 2px var(--hair),0 8px 22px -12px rgba(120,60,75,.45)}
-#stage{display:block;width:100%;height:auto;aspect-ratio:360/400;max-width:100%;touch-action:manipulation;cursor:pointer}
+@media (max-width:520px){.stage-wrap{margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));border-radius:0;box-shadow:none}}
+#stage{display:block;width:100%;height:auto;aspect-ratio:480/320;max-width:100%;touch-action:manipulation;cursor:pointer}
 .hint{position:absolute;left:10px;bottom:8px;font-size:11px;color:var(--ink);background:rgba(255,250,249,.82);padding:3px 9px;border-radius:999px;pointer-events:none}
 
 .panel{background:var(--panel);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:9px}
@@ -118,7 +119,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14p
   </section>
 
   <div class="stage-wrap">
-    <canvas id="stage" width="360" height="400" aria-label="小馬蕾與芙蕾雅的房間。點角色可以選擇，點頭部可以摸頭。"></canvas>
+    <canvas id="stage" width="480" height="320" aria-label="小馬蕾與芙蕾雅的房間。點角色可以選擇，點頭部可以摸頭。"></canvas>
     <div class="hint" id="hint">點角色選擇 · 點頭可以摸頭</div>
   </div>
 
@@ -153,7 +154,7 @@ const SPRITE_OVERRIDES = {
   // 'mare_act_idle_daily': { src: 'assets/characters/mare/act/mare_act_idle_daily_sheet_4f.png', frames: 4, fps: 6 },
 };
 
-const W = 360, H = 400, TAU = Math.PI * 2;
+const W = 480, H = 320, TAU = Math.PI * 2;
 const { sin, cos, abs, min, max, PI, floor, random, hypot } = Math;
 const clamp = (v, a = 0, b = 100) => v < a ? a : v > b ? b : v;
 const rnd = (a, b) => a + random() * (b - a);
@@ -218,11 +219,13 @@ const FOODS = [
 ];
 
 /* ---------- 房間位置 ---------- */
+/* 房間圖 assets/backgrounds/bg_room.jpg（1536×1024）縮成 480×320 後的位置 */
 const SPOTS = {
-  bed1:{x:140,y:214}, bed2:{x:142,y:244}, sofa1:{x:188,y:238}, sofa2:{x:236,y:238}, window:{x:210,y:262},
-  table1:{x:62,y:356}, table2:{x:158,y:356}, toys:{x:300,y:388}, center:{x:180,y:322},
-  front1:{x:148,y:384}, front2:{x:218,y:384}, tv1:{x:244,y:300}, tv2:{x:300,y:300}, careF:{x:96,y:286}
+  bed1:{x:52,y:116}, bed2:{x:104,y:146}, sofa1:{x:226,y:122}, sofa2:{x:274,y:122}, window:{x:250,y:168},
+  table1:{x:150,y:262}, table2:{x:198,y:266}, toys:{x:360,y:262}, center:{x:247,y:222},
+  front1:{x:205,y:292}, front2:{x:290,y:294}, tv1:{x:350,y:192}, tv2:{x:405,y:194}, careF:{x:168,y:160}
 };
+const FLOOR = { x0:40, x1:440, y0:168, y1:300 };
 
 /* ---------- 畫布 ---------- */
 const cv = document.getElementById('stage');
@@ -817,7 +820,7 @@ const REF_LIST = {
 };
 for (const ch of ['mare', 'freya']) for (const g of ['act', 'face', 'wear']) for (const n of (g === 'face' ? REF_LIST.face[ch] : REF_LIST[g])){
   const img = new Image(); img.onload = () => { REF[`${ch}_${g}_${n}`] = img; };
-  img.src = `assets/characters/${ch}/${g}/${ch}_${g}_${n}.png`;
+  img.src = `assets/characters/${ch}/${g}/${ch}_${g}_${n}.webp`;
 }
 const FACE_MAP = {
   mare: { normal:'normal', smile:'smile', gentle:'smile', happy:'happy', excited:'happy', bliss:'happy', eat:'happy', spoiled:'spoiled', shy:'spoiled',
@@ -839,14 +842,13 @@ function refPick(pet, st){
   if (['idle', 'tv', 'care', 'duo_feed', 'search', 'wave', 'groom', 'drink'].includes(a) && ['normal', 'smile', 'gentle', 'happy', 'drink'].includes(st.expr)) return stand();
   return [`${id}_face_${FACE_MAP[id][st.expr] || 'normal'}`, 'sit'];
 }
-const REF_H = { stand:118, walk:118, sit:100, tub:92, lie:68 };
+const REF_H = { stand:122, walk:122, sit:104, tub:98, lie:60 };
 function drawRef(pet, st, now){
   let [key, kind] = refPick(pet, st), img = REF[key];
   if (!img){ img = REF[`${pet.id}_act_idle`]; kind = 'stand'; }
   if (!img) return false;
   const h = REF_H[kind] * (pet.id === 'freya' ? 1.05 : 1), k = h / img.height, w = img.width * k;
   let cx = pet.x, by = pet.y;
-  if (kind === 'lie'){ cx = pet.x - 52; by = pet.y + 16; }
   if (kind !== 'lie'){ ell(cx, by - 1, w * .34 * (1 - st.bob / 70), 6); ctx.fillStyle = 'rgba(110,60,70,.16)'; ctx.fill(); }
   ctx.save();
   ctx.translate(cx, by); ctx.rotate(st.sway); ctx.translate(0, -st.bob);
@@ -997,7 +999,22 @@ function drawWindow(x, y, w, h, hr){
   }
   rr(x - 14, y - 14, w + 28, 7, 3); fs('#E9C49E', '#C99A74', 1.4);
 }
+const roomImg = new Image();
+roomImg.src = 'assets/backgrounds/bg_room.jpg';
 function drawRoom(now, tvOn){
+  if (roomImg.complete && roomImg.naturalWidth){
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(roomImg, 0, 0, W, H);
+    if (tvOn){
+      const c = floor(now / 400) % 3;
+      ctx.fillStyle = ['#9FD8F0', '#F9C7D3', '#FFE3A0'][c]; ctx.fillRect(359, 45, 68, 41);
+      emoji(['🐱', '🌈', '⭐'][c], 393, 66, 18);
+    }
+    return;
+  }
+  ctx.fillStyle = '#F7D9DF'; ctx.fillRect(0, 0, W, H);
+}
+function drawRoomOld(now, tvOn){
   const hr = hourNow();
   let g = ctx.createLinearGradient(0, 0, 0, 236); g.addColorStop(0, '#FCE7EB'); g.addColorStop(1, '#F7D8DE');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, 236);
@@ -1114,7 +1131,7 @@ class Pet {
   }
 }
 
-const pets = [new Pet('mare', 140, 330), new Pet('freya', 228, 334)];
+const pets = [new Pet('mare', 200, 240), new Pet('freya', 290, 244)];
 const P = id => pets.find(p => p.id === id);
 
 function eff(pet, d){
@@ -1143,7 +1160,7 @@ function goSleep(pet, quiet){
 }
 function wake(pet){
   pet.sleeping = false;
-  pet.run([{ anim:'tired', dur:1600, say: line(pet, 'wake') }, { to: { x: pet.id === 'mare' ? 120 : 200, y: 300 }, dur: 0 }]);
+  pet.run([{ anim:'tired', dur:1600, say: line(pet, 'wake') }, { to: { x: pet.id === 'mare' ? 170 : 240, y: 200 }, dur: 0 }]);
 }
 
 function think(pet, now){
@@ -1169,7 +1186,7 @@ function think(pet, now){
   if (pet.id === 'mare' && s.mood > 50 && random() < .07 && !o.busy() && !o.sleeping && !o.sick){ startDuo('prank'); return; }
   if (pet.id === 'freya' && random() < .1){ pet.run([{ anim:'confused', dur:2600, say: line(pet, 'confused') }]); return; }
   const r = random();
-  if (r < .35) pet.run([{ to: { x: rnd(40, 320), y: rnd(272, 386) }, dur: 0 }]);
+  if (r < .35) pet.run([{ to: { x: rnd(FLOOR.x0, FLOOR.x1), y: rnd(FLOOR.y0, FLOOR.y1) }, dur: 0 }]);
   else if (r < .47) pet.run([{ to: SPOTS.toys, dur:0, face:1 }, { anim:'play_toy', dur:4000, end: p => eff(p, { mood:4, energy:-2 }) }]);
   else if (r < .55) pet.run([{ anim:'groom', dur:3000, end: p => eff(p, { clean:4 }) }]);
   else if (r < .63) pet.run([{ to: SPOTS.window, dur:0 }, { anim:'idle', dur:3000 }]);
@@ -1179,7 +1196,7 @@ function think(pet, now){
 
 /* ---------- 雙人互動 ---------- */
 const DUO = {
-  play:  { label:'一起玩', dur:6500, spots:{ mare:{x:122,y:330}, freya:{x:244,y:330} }, faces:{ mare:1, freya:-1 }, anims:{ mare:'duo_play', freya:'duo_play' },
+  play:  { label:'一起玩', dur:6500, spots:{ mare:{x:180,y:250}, freya:{x:315,y:250} }, faces:{ mare:1, freya:-1 }, anims:{ mare:'duo_play', freya:'duo_play' },
            say:{ mare:'接住喔～！', freya:'看我的！' }, eff:{ mood:15, energy:-8, affection:3 } },
   eat:   { label:'一起吃', dur:6500, spots:{ mare:SPOTS.table2, freya:SPOTS.table1 }, faces:{ mare:-1, freya:1 }, anims:{ mare:'duo_eaten', freya:'duo_feed' },
            say:{ mare:'啊～嗯！好好吃！', freya:'來，啊～' }, eff:{ hunger:30, mood:8 } },
@@ -1194,7 +1211,7 @@ function startDuo(type){
   const m = P('mare'), f = P('freya'), D = DUO[type];
   for (const p of pets){ p.queue = []; p.cur = null; if (type !== 'care' || p.id !== 'mare') p.sleeping = false; }
   let spots = D.spots;
-  if (type === 'prank'){ const side = f.x > 180 ? -46 : 46; spots = { mare: { x: clamp(f.x + side, 30, 330), y: f.y + 2 }, freya: { x: f.x, y: f.y } }; }
+  if (type === 'prank'){ const side = f.x > W / 2 ? -52 : 52; spots = { mare: { x: clamp(f.x + side, FLOOR.x0, FLOOR.x1), y: f.y + 2 }, freya: { x: f.x, y: f.y } }; }
   m.moveTo(spots.mare.x, spots.mare.y); f.moveTo(spots.freya.x, spots.freya.y);
   duo = { type, stage:'gather', t0:0, members:[m, f], spots };
 }
@@ -1246,8 +1263,8 @@ const GOOD = ['🍓', '🍰', '🍬', '🍮', '🍩'];
 function startMinigame(pet){
   for (const p of pets){ p.queue = []; p.cur = null; p.target = null; }
   duo = null;
-  mg = { pet, t0: performance.now(), score: 0, items: [], spawn: 0, px: 180, tx: 180, done: false, saved: { x: pet.x, y: pet.y } };
-  pet.x = 180; pet.y = 388; pet.setAnim('mg_run');
+  mg = { pet, t0: performance.now(), score: 0, items: [], spawn: 0, px: W / 2, tx: W / 2, done: false, saved: { x: pet.x, y: pet.y } };
+  pet.x = W / 2; pet.y = H - 8; pet.setAnim('mg_run');
   document.getElementById('hint').textContent = '左右拖曳或用方向鍵移動，接住點心、避開蟲子！';
 }
 function updateMinigame(dt, now){
@@ -1259,7 +1276,7 @@ function updateMinigame(dt, now){
   if (g.spawn <= 0 && e < 19){ g.spawn = rnd(.38, .62); const bad = random() < .17; g.items.push({ x: rnd(24, W - 24), y: 64, v: rnd(95, 150) + e * 4, ch: bad ? '🐛' : pick(GOOD), bad }); }
   for (const it of g.items){
     it.y += it.v * dt;
-    if (!it.hit && it.y > 300 && it.y < 340 && abs(it.x - g.px) < 34){
+    if (!it.hit && it.y > H - 100 && it.y < H - 56 && abs(it.x - g.px) < 36){
       it.hit = true;
       if (it.bad){ g.score = max(0, g.score - 2); pet.setAnim('surprised'); pet.say(pet.id === 'freya' ? '呀！蟲子！' : '哇！', 900); setTimeout(() => mg && !mg.done && pet.setAnim('mg_run'), 600); }
       else { g.score++; g.pop = { x: it.x, y: it.y, t: now }; }
@@ -1274,7 +1291,7 @@ function updateMinigame(dt, now){
 function endMinigame(){
   const g = mg, pet = g.pet;
   eff(pet, { mood: min(30, g.score * 1.6), energy: -10, hunger: -6, affection: 2 });
-  pet.x = g.saved.x; pet.y = g.saved.y < 260 ? 320 : g.saved.y; pet.setAnim(pet.rest());
+  pet.x = g.saved.x; pet.y = g.saved.y; pet.setAnim(pet.rest());
   mg = null; document.getElementById('hint').textContent = '點角色選擇 · 點頭可以摸頭';
   save(); renderUI();
 }
@@ -1283,7 +1300,7 @@ function drawMinigame(now){
   const grad = ctx.createLinearGradient(0, 0, 0, H); grad.addColorStop(0, '#FDE7EC'); grad.addColorStop(1, '#FBE8C9');
   ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = 'rgba(255,255,255,.5)'; for (let i = 0; i < 8; i++){ ell((i * 53 + now / 40) % (W + 40) - 20, 40 + (i % 3) * 22, 18, 7); ctx.fill(); }
-  ctx.fillStyle = '#EAC9A6'; ctx.fillRect(0, 392, W, 8);
+  ctx.fillStyle = '#EAC9A6'; ctx.fillRect(0, H - 8, W, 8);
   for (const it of g.items) emoji(it.ch, it.x, it.y, 26);
   drawPet(g.pet, now); drawSpeech(g.pet, now);
   if (g.pop && now - g.pop.t < 500){ ctx.globalAlpha = 1 - (now - g.pop.t) / 500; txt('+1', g.pop.x, g.pop.y - 20 - (now - g.pop.t) / 20, 18, '#E07A92'); ctx.globalAlpha = 1; }
@@ -1561,7 +1578,7 @@ function applySave(d, catchUp = true){
     Object.assign(p.stats, s.stats); p.outfit = OUTFIT_KEYS.includes(s.outfit) ? s.outfit : 'daily';
     p.sleeping = !!s.sleeping; p.sick = !!s.sick;
     if (p.sleeping){ const b = p.id === 'mare' ? SPOTS.bed1 : SPOTS.bed2; p.x = b.x; p.y = b.y; }
-    else if (typeof s.x === 'number'){ p.x = clamp(s.x, 30, 330); p.y = clamp(s.y, 262, 390); }
+    else if (typeof s.x === 'number'){ p.x = clamp(s.x, FLOOR.x0, FLOOR.x1); p.y = clamp(s.y, FLOOR.y0, FLOOR.y1); }
     p.queue = []; p.cur = null; p.target = null; p.setAnim(p.rest());
   }
   if (catchUp){
@@ -1580,7 +1597,7 @@ function save(){
 }
 function resetGame(){
   for (const p of pets){ p.stats = { hunger:80, mood:75, clean:80, energy:85, health:95, affection:50 }; p.outfit = 'daily'; p.sleeping = p.sick = false; p.queue = []; p.cur = null; p.target = null; p.setAnim('idle'); }
-  P('mare').x = 140; P('mare').y = 330; P('freya').x = 228; P('freya').y = 334;
+  P('mare').x = 200; P('mare').y = 240; P('freya').x = 290; P('freya').y = 244;
   duo = null; mg = null; speed = 1; saveTimer = 0; save(); renderUI(); greet();
 }
 function greet(){
@@ -1618,10 +1635,9 @@ function frame(now){
   else {
     const tvOn = duo && duo.type === 'tv' && duo.stage === 'act';
     drawRoom(now, tvOn);
-    const list = [...pets.map(p => ({ y: p.y, d: () => drawPet(p, now) })), { y: 352, d: drawTable }, { y: 362, d: drawToys }];
+    const list = pets.map(p => ({ y: p.y, d: () => drawPet(p, now) }));
     list.sort((a, b) => a.y - b.y).forEach(o => o.d());
     drawDuoFx(now);
-    if (isNight()){ ctx.fillStyle = 'rgba(40,30,90,.16)'; ctx.fillRect(0, 0, W, H); }
     for (const p of pets) drawFx(p, now);
     bubbleRects.length = 0;
     for (const p of [...pets].sort((a, b) => (a.speech?.until || 0) - (b.speech?.until || 0))) drawSpeech(p, now);
