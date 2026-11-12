@@ -1,0 +1,21 @@
+{
+  "name": "fantasy-trio-spike-spine",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Frozen technical prototype: can a Spine skeleton live in a transparent, click-through Tauri 2 window? Not part of Petween or of the Fantasy Trio app.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "typescript": "^5",
+    "vite": "^6"
+  }
+}

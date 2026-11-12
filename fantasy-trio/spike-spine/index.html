@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>spike-spine stage</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      canvas.figure {
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform-origin: 0 0;
+        pointer-events: none;
+      }
+      #hud {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        padding: 8px 10px;
+        font: 12px/1.5 ui-monospace, Consolas, monospace;
+        color: #fff;
+        background: rgba(20, 22, 30, 0.78);
+        border-radius: 8px;
+        white-space: pre;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hud"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

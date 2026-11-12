@@ -1,0 +1,6 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+# Spine test assets are downloaded by whoever runs the prototype; they are not ours to redistribute here.
+public/spine/

@@ -1,0 +1,354 @@
+{
+  "format": 1,
+  "id": "fufu",
+  "name": "芙芙（佔位）",
+  "attribution": {
+    "creators": [
+      "Fantasy Trio"
+    ],
+    "license": "僅個人使用；佔位人形，非正式角色美術"
+  },
+  "scale": 0.7,
+  "clips": {
+    "idle": {
+      "type": "still",
+      "source": "clips/idle.webp",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "walk": {
+      "type": "frames",
+      "source": "clips/walk.webp",
+      "fps": 10,
+      "frames": {
+        "count": 8,
+        "columns": 8
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "turn": {
+      "type": "still",
+      "source": "clips/turn.webp",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "wave": {
+      "type": "frames",
+      "source": "clips/wave.webp",
+      "fps": 9,
+      "frames": {
+        "count": 6,
+        "columns": 6
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "happy": {
+      "type": "still",
+      "source": "clips/happy.webp",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "dragged": {
+      "type": "still",
+      "source": "clips/dragged.webp",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "think": {
+      "type": "still",
+      "source": "clips/think.webp",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "oops": {
+      "type": "still",
+      "source": "clips/oops.webp",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.956
+      }
+    },
+    "sit": {
+      "type": "still",
+      "source": "clips/sit.webp",
+      "anchor": {
+        "x": 0.375,
+        "y": 0.956
+      }
+    },
+    "sleep": {
+      "type": "still",
+      "source": "clips/sleep.webp",
+      "anchor": {
+        "x": 0.375,
+        "y": 0.956
+      }
+    }
+  },
+  "motions": {
+    "breathe": {
+      "type": "sine",
+      "property": "scaleY",
+      "amplitude": 0.008,
+      "periodMs": 3600
+    },
+    "sway": {
+      "type": "sine",
+      "property": "rotate",
+      "amplitude": 0.7,
+      "periodMs": 5200
+    },
+    "busy": {
+      "type": "sine",
+      "property": "y",
+      "amplitude": 1.5,
+      "periodMs": 800
+    },
+    "ponder": {
+      "type": "noise",
+      "property": "rotate",
+      "amplitude": 1.2,
+      "frequency": 0.5
+    },
+    "dangle": {
+      "type": "sine",
+      "property": "rotate",
+      "amplitude": 3,
+      "periodMs": 900
+    },
+    "hop": {
+      "type": "keyframes",
+      "tracks": {
+        "y": [
+          {
+            "t": 0,
+            "v": 0
+          },
+          {
+            "t": 170,
+            "v": -22,
+            "ease": "out"
+          },
+          {
+            "t": 340,
+            "v": 0,
+            "ease": "in"
+          },
+          {
+            "t": 420,
+            "v": -4,
+            "ease": "out"
+          },
+          {
+            "t": 500,
+            "v": 0,
+            "ease": "in"
+          }
+        ]
+      }
+    },
+    "shake": {
+      "type": "keyframes",
+      "tracks": {
+        "x": [
+          {
+            "t": 0,
+            "v": 0
+          },
+          {
+            "t": 50,
+            "v": -4
+          },
+          {
+            "t": 100,
+            "v": 4
+          },
+          {
+            "t": 150,
+            "v": -3
+          },
+          {
+            "t": 200,
+            "v": 2
+          },
+          {
+            "t": 260,
+            "v": 0
+          }
+        ]
+      }
+    }
+  },
+  "states": {
+    "idle": {
+      "clips": [
+        "idle"
+      ],
+      "loop": [
+        "breathe",
+        "sway"
+      ],
+      "transition": "crossfade"
+    },
+    "idle.long": {
+      "clips": [
+        "sleep"
+      ],
+      "loop": [
+        "breathe"
+      ],
+      "transition": "crossfade"
+    },
+    "active": {
+      "clips": [
+        "idle"
+      ],
+      "loop": [
+        "busy"
+      ]
+    },
+    "active.thinking": {
+      "clips": [
+        "think"
+      ],
+      "loop": [
+        "ponder"
+      ]
+    },
+    "waiting": {
+      "clips": [
+        "wave"
+      ],
+      "loop": [
+        "breathe"
+      ]
+    },
+    "success": {
+      "clips": [
+        "happy"
+      ],
+      "enter": "hop",
+      "loop": [
+        "breathe"
+      ]
+    },
+    "error": {
+      "clips": [
+        "oops"
+      ],
+      "enter": "shake"
+    },
+    "fantasy-trio.walk": {
+      "clips": [
+        "walk"
+      ]
+    },
+    "fantasy-trio.turn": {
+      "clips": [
+        "turn"
+      ]
+    },
+    "fantasy-trio.sit": {
+      "clips": [
+        "sit"
+      ],
+      "loop": [
+        "breathe"
+      ],
+      "transition": "crossfade"
+    },
+    "fantasy-trio.sleep": {
+      "clips": [
+        "sleep"
+      ],
+      "loop": [
+        "breathe"
+      ],
+      "transition": "crossfade"
+    },
+    "fantasy-trio.wave": {
+      "clips": [
+        "wave"
+      ]
+    },
+    "fantasy-trio.react": {
+      "clips": [
+        "happy"
+      ],
+      "enter": "hop"
+    },
+    "fantasy-trio.dragged": {
+      "clips": [
+        "dragged"
+      ],
+      "loop": [
+        "dangle"
+      ]
+    }
+  },
+  "plugins": {
+    "fantasy-trio": {
+      "character": "fufu",
+      "displayName": "芙芙",
+      "behavior": {
+        "walkSpeed": 80,
+        "restMs": [
+          7000,
+          16000
+        ],
+        "sitChance": 0.4,
+        "chatterMs": [
+          90000,
+          200000
+        ],
+        "waveChance": 0.2
+      },
+      "lines": {
+        "click": [
+          "欸嘿，你回來啦！",
+          "今天也辛苦了。",
+          "唔……戳我做什麼啦。",
+          "嘿嘿，抓不到我～"
+        ],
+        "hover": [
+          "我有點想睡覺了……",
+          "在偷看我嗎？",
+          "哼哼，有事找芙芙？"
+        ],
+        "idle": [
+          "呼啊……好睏。",
+          "我想自己待一下下。",
+          "今天的蝴蝶結有綁好嗎？"
+        ],
+        "greet": [
+          "欸嘿，你回來啦！",
+          "啊，是你呀。"
+        ],
+        "dragStart": [
+          "欸欸欸——放我下來啦！",
+          "嗚哇，飛起來了！"
+        ],
+        "dragEnd": [
+          "哼，下次要先說一聲喔。",
+          "這裡……好像也可以。"
+        ]
+      }
+    }
+  }
+}

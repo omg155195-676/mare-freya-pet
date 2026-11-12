@@ -1,0 +1,28 @@
+{
+  "id": "fantasy-trio",
+  "name": "Fantasy Trio",
+  "version": "0.1.0",
+  "apiVersion": 1,
+  "main": "main.js",
+  "permissions": ["fs:read"],
+  "contributes": {
+    "stateKeys": [
+      { "key": "fantasy-trio.walk", "label": "走路" },
+      { "key": "fantasy-trio.turn", "label": "轉身" },
+      { "key": "fantasy-trio.sit", "label": "坐下" },
+      { "key": "fantasy-trio.sleep", "label": "小睡" },
+      { "key": "fantasy-trio.wave", "label": "揮手" },
+      { "key": "fantasy-trio.react", "label": "被點擊的反應" },
+      { "key": "fantasy-trio.dragged", "label": "被拖曳" }
+    ],
+    "channels": ["state", "position", "motion", "bubble"],
+    "settings": [
+      { "key": "show.xiaomalei", "label": "顯示 小馬蕾", "type": "boolean", "default": true, "section": "顯示角色" },
+      { "key": "show.fufu", "label": "顯示 芙芙", "type": "boolean", "default": true, "section": "顯示角色" },
+      { "key": "show.freya", "label": "顯示 芙蕾雅", "type": "boolean", "default": true, "section": "顯示角色", "description": "隱藏時會記住她的位置和大小，再次顯示時放回原位。" },
+      { "key": "roam", "label": "自由走動", "type": "boolean", "default": true, "section": "行為" },
+      { "key": "speedPct", "label": "走路速度", "type": "number", "default": 100, "min": 40, "max": 250, "step": 10, "unit": "%", "section": "行為" },
+      { "key": "chatter", "label": "偶爾自己說話", "type": "boolean", "default": true, "section": "行為" }
+    ]
+  }
+}
