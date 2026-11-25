@@ -11,6 +11,10 @@
 | `sw.js` | 離線快取 |
 | `icons/` | App 圖示 |
 | `.nojekyll` | 讓 GitHub Pages 原樣提供檔案 |
+| `assets/` | 角色圖與房間背景 |
+| `tools/` | 產生角色圖的工具 |
+| `docs/design-spec.md` | 角色與美術規格 |
+| `CLAUDE.md` | 給 Claude 的專案說明（開新對話時會自動讀取） |
 
 ## 開啟 GitHub Pages
 

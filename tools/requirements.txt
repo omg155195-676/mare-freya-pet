@@ -1,0 +1,6 @@
+# 角色圖產生工具（tools/hires.py）用。torch 請裝 CPU 版：
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+spandrel
+numpy
+scipy
+pillow
